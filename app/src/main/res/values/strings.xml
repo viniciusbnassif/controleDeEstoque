@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Controle de Estoque</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <!-- Strings used for fragments for navigation -->
+    <string name="data_de_finalizacao">Data de finalização</string>
+    <string name="hora_de_finalizacao">Hora de finalização</string>
+    <string name="caixas_avulsas">Caixas Avulsas</string>
+    <string name="finalizar">Finalizar</string>
+    <string name="campo_obrigatorio">* Campo Obrigatório</string>
+    <string name="total">Total</string>
+    <string name="connectionErroResult2">Servidor não encontrado nessa rede (Endereço e porta indisponíveis para esta rede)</string>
+    <string name="connectionErroResult1">Não foi possível estabelecer uma conexão com o servidor</string>
+    <string name="sincComSucesso">Sincronizado com sucesso</string>
+</resources>

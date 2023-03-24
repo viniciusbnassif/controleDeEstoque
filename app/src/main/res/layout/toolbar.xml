@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    style="md.sys.color.shadow"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:titleTextColor="@color/white"
+    android:background="@color/colorPrimary"
+    android:outlineAmbientShadowColor="@color/colorPrimaryVariant"
+    app:layout_scrollFlags="scroll|enterAlways"
+    android:elevation="8dp">
+
+
+</androidx.appcompat.widget.Toolbar>

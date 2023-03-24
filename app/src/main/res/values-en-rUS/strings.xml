@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Controle de Estoque</string>
+    <string name="data_de_finalizacao">End data</string>
+    <string name="hora_de_finalizacao">End time</string>
+    <string name="caixas_avulsas">Single Boxes</string>
+    <string name="finalizar">Finish</string>
+    <string name="campo_obrigatorio">* Can\'t be empty</string>
+    <string name="total">Total</string>
+    <string name="connectionErroResult2">Server not found on the actual network (URL and port not found)</string>
+    <string name="connectionErroResult1">Unable to estabilish a conection to the server.</string>
+    <string name="sincComSucesso">Successfully synced</string>
+</resources>
