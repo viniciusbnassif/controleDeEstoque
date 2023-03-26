@@ -112,10 +112,10 @@ fun main() {
 }
 
 fun queryProdutoExt(context: Context?) {
-    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
     connect().use {
-        var st1 = it?.createStatement()!!
-        var resultSet1 = st1.executeQuery(
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
             """
             SELECT *
               FROM Produto

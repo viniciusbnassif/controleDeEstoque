@@ -8,7 +8,151 @@
     tools:context=".MainActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:titleTextColor="@color/white"
+            app:menu="@menu/main_actv"
+            app:title="Controle de Estoque" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Note: A RecyclerView can also be used -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Scrollable content -->
+
+
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/elementsOnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20sp"
+                android:layout_marginRight="20sp"
+                android:orientation="vertical">
+
+                <Space
+                    android:id="@+id/space1"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    app:layout_constraintBottom_toTopOf="@+id/viewUser"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/viewUser"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:autofillHints="username"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toTopOf="@id/viewPassword"
+                    app:layout_constraintEnd_toStartOf="@+id/loginscreen_login"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/space1">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Nome de Usuário"
+                        android:inputType="textVisiblePassword"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/viewPassword"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/loginscreen_login"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/viewUser"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Senha"
+                        android:imeOptions="actionSend"
+                        android:inputType="textNoSuggestions|textPassword" />
+
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <!--Button
+                    android:id="@+id/loginscreen_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:baselineAligned="false"
+                    android:gravity="center|end"
+                    android:text="Entrar"
+                    app:icon="@drawable/ic_outline_login_24_white" /-->
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/loginscreen_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:insetLeft="4dp"
+                    android:insetTop="5dp"
+                    android:insetBottom="0dp"
+                    android:onClick="progressVisibility"
+                    android:text="Entrar"
+                    app:cornerRadius="5dp"
+                    app:layout_constraintBottom_toBottomOf="@id/viewPassword"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/viewUser"
+                    app:layout_constraintTop_toTopOf="@+id/viewUser" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/loginscreen_login"
+                    app:layout_constraintTop_toTopOf="@+id/loginscreen_login" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <!--androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +163,10 @@
         app:backgroundTint="@color/colorPrimary"
         app:title="Controle de Estoque"
         app:titleTextColor="@color/white">
-        <!--androidx.constraintlayout.widget.ConstraintLayout
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end">
@@ -33,12 +180,12 @@
                 android:progressTint="@color/colorSecondary"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/refresh"
+                app:layout_constraintEnd_toStartOf="@+id/info"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                android:id="@+id/refresh"
+                android:id="@+id/info"
                 android:layout_width="65dp"
                 android:layout_height="62dp"
                 android:backgroundTint="@color/colorPrimary"
@@ -56,132 +203,26 @@
                 android:src="@drawable/ic_baseline_cancel_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/refresh"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/info"
+                app:layout_constraintTop_toTopOf="parent"/>
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout-->
-    </androidx.appcompat.widget.Toolbar>
-
-    <Space
-        android:id="@+id/space"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        app:layout_constraintBottom_toTopOf="@+id/scl"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/toolbar" />
-
-    <ScrollView
-        android:id="@+id/scl"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/space">
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/elementsOnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="20sp"
-            android:layout_marginRight="20sp"
-            android:orientation="vertical">
-
-            <Space
-                android:id="@+id/space1"
-                android:layout_width="match_parent"
-                android:layout_height="64dp"
-                app:layout_constraintBottom_toTopOf="@+id/viewUser"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/viewUser"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:autofillHints="username"
-                android:visibility="visible"
-                app:layout_constraintBottom_toTopOf="@id/viewPassword"
-                app:layout_constraintEnd_toStartOf="@+id/loginscreen_login"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/space1">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextUsername"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="Nome de Usuário"
-                    android:inputType="textVisiblePassword"
-                    android:singleLine="true" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/viewPassword"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/loginscreen_login"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/viewUser"
-                app:passwordToggleEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Senha"
-                    android:imeOptions="actionSend"
-                    android:inputType="textNoSuggestions|textPassword" />
-
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!--Button
-                android:id="@+id/loginscreen_login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:baselineAligned="false"
-                android:gravity="center|end"
-                android:text="Entrar"
-                app:icon="@drawable/ic_outline_login_24_white" /-->
-
-
-            <Button
-                android:id="@+id/loginscreen_login"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:insetLeft="4dp"
-                android:insetTop="5dp"
-                android:insetBottom="0dp"
-                android:text="Entrar"
-                app:cornerRadius="5dp"
-                app:layout_constraintBottom_toBottomOf="@id/viewPassword"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/viewUser"
-                app:layout_constraintTop_toTopOf="@+id/viewUser"></Button>
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progress"
-
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/loginscreen_login"
-                app:layout_constraintTop_toTopOf="@+id/loginscreen_login" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </ScrollView>
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/info" />
+    </androidx.appcompat.widget.Toolbar-->
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

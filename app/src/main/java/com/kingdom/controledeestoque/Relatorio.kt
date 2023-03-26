@@ -2,12 +2,16 @@ package com.kingdom.controledeestoque
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
+import kotlinx.coroutines.*
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class Relatorio : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +35,13 @@ class Relatorio : AppCompatActivity() {
         myWebView.clearCache(true)
         myWebView.clearHistory()
         myWebView.settings.javaScriptEnabled = true
-        myWebView.loadUrl("http://192.168.1.10/report_server/Pages/ReportViewer.aspx?%2fLiderMinas%2fRLM0077&rs:Command=Render")
-        progress.visibility = View.INVISIBLE
+
+        GlobalScope.launch {
+            try{
+                myWebView.loadUrl("http://192.168.1.10/report_server/Pages/ReportViewer.aspx?%2fLiderMinas%2fRLM0077&rs:Command=Render")
+            } catch (e: Exception){}
+            progress.visibility = View.INVISIBLE
+        }
 
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -49,7 +58,13 @@ class Relatorio : AppCompatActivity() {
         var refresh = findViewById<ImageView>(R.id.refresh)
 
         refresh.setOnClickListener{
-            myWebView.reload()
+            GlobalScope.launch {
+                try{
+                    myWebView.reload()
+                } catch (e: Exception){}
+                progress.visibility = View.INVISIBLE
+            }
+
         }
 
         var close = findViewById<ImageView>(R.id.close)

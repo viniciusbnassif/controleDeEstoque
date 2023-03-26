@@ -19,7 +19,7 @@ class SQLiteHelper(context: Context?):
 {
     //var dbConnectExt = queryProdutoExt()
     //var connector = connectMSSQL()
-    val db = this.writableDatabase
+    private val db: SQLiteDatabase = this.writableDatabase
     companion object {
 
         private const val DATABASE_VERSION = 1
