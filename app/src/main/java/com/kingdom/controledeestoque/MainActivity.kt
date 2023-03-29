@@ -19,6 +19,8 @@ import kotlinx.coroutines.*
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet.Constraint
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
@@ -26,6 +28,7 @@ import com.kingdom.controledeestoque.SQLiteHelper
 import com.kingdom.controledeestoque.database.LoadContent
 import com.kingdom.controledeestoque.database.Sync
 import com.kingdom.controledeestoque.database.confirmUnPw
+import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +74,9 @@ class MainActivity : AppCompatActivity() {
         val pw = findViewById<EditText>(R.id.editTextPassword)
         val pwView = findViewById<TextInputLayout>(R.id.viewPassword)
 
+
+
+
         fun syncIsDone(){
             var mainMenu = Intent(this, MainMenu::class.java).apply {
                 putExtra(AlarmClock.EXTRA_MESSAGE, user.text.toString())
@@ -78,6 +84,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(mainMenu)
 
             finish()
+
+
         }
 
 
@@ -109,7 +117,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-        fun connectionView(): String {
+        suspend fun connectionView(): String {
 
             var result = Sync().testConnection()
 
@@ -130,7 +138,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun authUser(ctxt: android.content.Context) {
+        suspend fun authUser(ctxt: android.content.Context) {
             showProgress("true")
 
             val user = findViewById<EditText>(R.id.editTextUsername)
@@ -171,16 +179,19 @@ class MainActivity : AppCompatActivity() {
                     var username = user.text.toString()
                     //var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
                     //progress.visibility = VISIBLE
-
-                    GlobalScope.launch {
+                    CoroutineScope(Dispatchers.IO).launch(CoroutineName("SyncMainActivity")) {
                         try {
                             Looper.prepare()
-                            sync.syncNoReturn(0, ctxt)
+                            Looper.myLooper()
+                            sync.sync(0, ctxt)
+                            Looper.myLooper()?.quit()
                         } catch (e: Exception){}
                         syncIsDone()
-
                         finish()
+                        cancel()
                     }
+
+
                 } else if (validation == 401) {
 
                     userView.setError(" ")
@@ -219,10 +230,12 @@ class MainActivity : AppCompatActivity() {
         val button: Button = findViewById(R.id.loginscreen_login)
         button.setOnClickListener {
             showProgress("true")
-            authUser(this)
+            var context = this
+            MainScope().launch { authUser(context) }
 
         }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_actv, menu)

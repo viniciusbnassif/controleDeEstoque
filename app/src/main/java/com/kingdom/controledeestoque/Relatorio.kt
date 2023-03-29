@@ -8,6 +8,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import kotlinx.coroutines.GlobalScope
@@ -24,6 +25,7 @@ class Relatorio : AppCompatActivity() {
             // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
             // a general rule, you should design your app to hide the status bar whenever you
             // hide the navigation bar.
+            //
             systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
 
@@ -58,12 +60,8 @@ class Relatorio : AppCompatActivity() {
         var refresh = findViewById<ImageView>(R.id.refresh)
 
         refresh.setOnClickListener{
-            GlobalScope.launch {
-                try{
                     myWebView.reload()
-                } catch (e: Exception){}
-                progress.visibility = View.INVISIBLE
-            }
+
 
         }
 

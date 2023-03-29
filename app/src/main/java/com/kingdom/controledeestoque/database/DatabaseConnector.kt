@@ -6,6 +6,10 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy.Builder
 import android.util.Log
 import com.kingdom.controledeestoque.SQLiteHelper
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -111,7 +115,12 @@ fun main() {
     //queryProdutoExt()
 }
 
-fun queryProdutoExt(context: Context?) {
+fun getProdutoExt(context: Context?) {
+
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+    var count = 0
+
     val dbIntrn: SQLiteHelper = SQLiteHelper(context)
     connect().use {
         val st1 = it?.createStatement()!!
@@ -122,21 +131,14 @@ fun queryProdutoExt(context: Context?) {
              ORDER BY idProduto
             """.trimIndent()
         )
-        /*while (resultSet1.next()) {
-            arrayProdutoIdExt.add(resultSet1.getInt("idProduto"))   // same as resultSet1.getLong(1)
-            arrayProdutoDescExt.add(resultSet1.getString("descProduto")) // same as resultSet1.getString(2)
-            arrayProdutoQeExt.add(resultSet1.getInt("qeProduto")) // same as resultSet1.getString(2)
-            arrayProdutoValExt.add(resultSet1.getInt("validProduto")) // same as resultSet1.getString(2)
-            arrayProdutoTipoExt.add(resultSet1.getString("tipoVProduto")) // same as resultSet1.getString(2)
-            // process
-        }*/
         dbIntrn.externalExecSQL("DELETE FROM Produto")
         while (resultSet1.next()){
+
             var query = "INSERT INTO Produto (idProduto, codProduto, descProduto, tipoProduto, unidMedida, rastro) " +
                     "VALUES (${resultSet1.getInt("idProduto")}, '${resultSet1.getString("codProduto")}', '${resultSet1.getString("descProduto")}', " +
                     "'${resultSet1.getString("tipoProduto")}', '${resultSet1.getString("unidMedida")}', '${resultSet1.getString("rastro")}')"
             dbIntrn.externalExecSQL(query)
-            Log.d("SQL Insert", "${resultSet1.getString("descProduto")} inserido com sucesso")
+            Log.d("SQL Insert", "${resultSet1.getString("descProduto")} inserido com sucesso (${resultSet1.getInt("idProduto")})")
         }
 
         resultSet1.close()
@@ -146,37 +148,123 @@ fun queryProdutoExt(context: Context?) {
 
     }
 }
+fun getArmz(context: Context?) {
 
-fun queryMotivoExt(context: Context) {
-    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
-     //variavel dbIntrn recebe classe do Banco de dados localizado no dispositivo (Database.kt)
-    connect().use {//Conexão ao banco de dados externo.
-        var st1 = it?.createStatement()!!
-        var resultSet1 = st1.executeQuery(
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+
+    var count = 0
+
+    var tbl = "Armazem"
+    var id = "idArmazem"
+    var cod = "codArmazem"
+    var desc = "descArmazem"
+
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
             """
             SELECT *
-              FROM Motivo
-             ORDER BY idMotivo
+              FROM $tbl
+             ORDER BY idArmazem
             """.trimIndent()
         )
-        /*while (resultSet1.next()) {
-            arrayProdutoIdExt.add(resultSet1.getInt("idProduto"))   // same as resultSet1.getLong(1)
-            arrayProdutoDescExt.add(resultSet1.getString("descProduto")) // same as resultSet1.getString(2)
-            arrayProdutoQeExt.add(resultSet1.getInt("qeProduto")) // same as resultSet1.getString(2)
-            arrayProdutoValExt.add(resultSet1.getInt("validProduto")) // same as resultSet1.getString(2)
-            arrayProdutoTipoExt.add(resultSet1.getString("tipoVProduto")) // same as resultSet1.getString(2)
-            // process
-        }*/
-        dbIntrn.externalExecSQL("DELETE FROM Motivo")// <---------------------
+        dbIntrn.externalExecSQL("DELETE FROM $tbl")
         while (resultSet1.next()){
-            var query = "INSERT INTO Motivo (idMotivo, descMotivo) VALUES (${resultSet1.getInt("idMotivo")}, '${resultSet1.getString("descMotivo")}');"
+            count += 1
+            var query = "INSERT INTO $tbl ($id, $cod, $desc) " +
+                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$cod")}', '${resultSet1.getString("$desc")}') "
             dbIntrn.externalExecSQL(query)
+            Log.d("SQL Insert Armz", "${resultSet1.getString("$desc")} inserido com sucesso (${resultSet1.getInt("$id")})")
         }
 
         resultSet1.close()
         st1.close()
+
     }
 }
+fun getSaldo(context: Context?) {
+
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+
+    var count = 0
+
+    val tbl = "Saldo"
+    val id = "idSaldo"
+    val codP = "codProduto"
+    val codArmz = "codArmazem"
+    val saldo = "saldo"
+
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
+            """
+            SELECT *
+              FROM $tbl
+             ORDER BY $id
+            """.trimIndent()
+        )
+        dbIntrn.externalExecSQL("DELETE FROM $tbl")
+        while (resultSet1.next()){
+            count += 1
+            var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $saldo) " +
+                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$codP")}', '${resultSet1.getString("$codArmz")}'," +
+                    "'${resultSet1.getFloat("$saldo")}') "
+            dbIntrn.externalExecSQL(query)
+            Log.d("SQL Insert Saldo", "${resultSet1.getString("$codArmz")} inserido com sucesso (${resultSet1.getInt("$id")})")
+        }
+
+        resultSet1.close()
+        st1.close()
+
+    }
+}
+
+fun getSlLote(context: Context?) {
+
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+
+    var count = 0
+
+    val tbl = "SaldoLote"
+    val id = "idSaldoLote"
+    val codP = "codProduto"
+    val codArmz = "codArmazem"
+    val lote = "lote"
+    val vldLote = "validLote"
+    val saldo = "saldoLote"
+
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
+            """
+            SELECT *
+              FROM $tbl
+             ORDER BY $id
+            """.trimIndent()
+        )
+        dbIntrn.externalExecSQL("DELETE FROM $tbl")
+        while (resultSet1.next()){
+            count += 1
+            var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $lote, $vldLote, $saldo) " +
+                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$codP")}', '${resultSet1.getString("$codArmz")}'," +
+                    "'${resultSet1.getString("$lote")}','${resultSet1.getString("$vldLote")}','${resultSet1.getFloat("$saldo")}') "
+            dbIntrn.externalExecSQL(query)
+            Log.d("SQL Insert SlLote", "${resultSet1.getString("$lote")} inserido com sucesso (${resultSet1.getInt("$id")})")
+        }
+
+        resultSet1.close()
+        st1.close()
+
+    }
+}
+
+
 
 /*fun queryExternalServerAE(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
@@ -299,8 +387,12 @@ fun queryExternalServerAP(context: Context) {
 fun confirmUnPw(username: String, password: String): Int {
     // Create an OkHttpClient object
 
+
     val policy = Builder().permitAll().build()
     StrictMode.setThreadPolicy(policy)
+
+
+
 
     val client = OkHttpClient()
 
@@ -359,6 +451,9 @@ fun confirmUnPw(username: String, password: String): Int {
         return rtn
     }
 }
+
+
+
 
     //==========================================================================
 

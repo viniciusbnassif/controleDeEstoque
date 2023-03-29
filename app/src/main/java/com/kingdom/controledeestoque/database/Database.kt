@@ -75,13 +75,13 @@ class SQLiteHelper(context: Context?):
 
         val createTBLUSUARIO = (
                 "CREATE TABLE " + TBL_USUARIO + " (" +
-                        ID_USUARIO + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        ID_USUARIO + " INTEGER NOT NULL PRIMARY KEY, " +
                         USERNAME + " VARCHAR(64) NOT NULL, " +
                         PASSWORD + " VARCHAR(64) NOT NULL " +
                         "); ")
         val createTBLPRODUTO = (
                 "CREATE TABLE "+ TBL_PRODUTO + " (" +
-                        ID_PRODUTO + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        ID_PRODUTO + " INTEGER NOT NULL PRIMARY KEY," +
                         COD_PROD + " VARCHAR(15)NOT NULL, " +
                         DESC_PROD + " VARCHAR(64)NOT NULL, " +
                         TIPO_PROD + " INTEGER NOT NULL, " +
@@ -91,13 +91,13 @@ class SQLiteHelper(context: Context?):
 
         val createTBLARMAZEM = (
                 "CREATE TABLE "+ TBL_ARMZ + " (" +
-                        ID_ARMZ + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        ID_ARMZ + " INTEGER NOT NULL PRIMARY KEY, " +
                         COD_ARMZ + " VARCHAR(2) NOT NULL, " +
                         DESC_ARMZ + " VARCHAR(255) NOT NULL" +
                         ");")
         val createTBLSALDO = (
                 "CREATE TABLE "+ TBL_SALDO + " (" +
-                        ID_SALDO + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
+                        ID_SALDO + " INTEGER NOT NULL PRIMARY KEY, " +
                         COD_PROD + " VARCHAR(15) NOT NULL, " +
                         COD_ARMZ + " VARCHAR(2) NOT NULL, " +
                         SALDO + " FLOAT NOT NULL, " +
@@ -106,6 +106,7 @@ class SQLiteHelper(context: Context?):
                         ");" )
         val createTBLSL = (
                 "CREATE TABLE "+ TBL_SALDOLOTE +" (" +
+                        ID_SL + " INTEGER NOT NULL PRIMARY KEY, " +
                         COD_PROD + " VARCHAR(15) NOT NULL, " +
                         COD_ARMZ + " VARCHAR(2) NOT NULL, " +
                         LOTE + " VARCHAR(10) NOT NULL, " +
@@ -140,6 +141,7 @@ class SQLiteHelper(context: Context?):
         //db?.execSQL("INSERT INTO Usuario (username, password) VALUES ('kane','123'), ('gilberto','12345', 'Gilberto Gonçalves'), ('zack', 'zsjl', 'Zachary Snyder');")
         //db?.execSQL("INSERT INTO produto (descProduto, qeProduto, validProduto, tipoVProduto) VALUES ('Selecione o item','', '', '');")
         //db?.execSQL("INSERT INTO produto (descProduto, qeProduto, validProduto, tipoVProduto) VALUES ('Pão 5 15 D','5', '15', 'D'), ('Pão 13 3 M','13', '3', 'M'), ('Pão 1 13 S', '1', '13', 'S');")
+        //
     }
 
     fun externalExecSQL(query: String){

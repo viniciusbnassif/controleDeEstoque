@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainMenu">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <!--com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -20,99 +20,133 @@
         app:layout_scrollFlags="scroll|enterAlways"
         app:navigationIconTint="@color/white"
         app:title="Menu principal"
-        app:titleTextColor="@color/white">
+        app:titleTextColor="@color/white"/-->
 
 
-
-
-    </com.google.android.material.appbar.MaterialToolbar>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/CL"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_behavior="com.example.FloatingActionButtonBehavior"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBar">
+        app:layout_constraintTop_toTopOf="parent">
 
-
-        <TextView
-            android:id="@+id/saudacao"
-            android:layout_width="wrap_content"
+        <!-- Note: A RecyclerView can also be used -->
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bem-vindo"
-            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/apEmbalados"/>
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                app:navigationIconTint="@color/white"
+                app:title="Menu Principal"
+                app:titleTextColor="@color/white" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="invisible" />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
 
-        <Button
-            android:id="@+id/apEmbalados"
-            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-            android:layout_width="0dp"
-            android:layout_height="108dp"
-            android:layout_marginStart="64dp"
-            android:layout_marginEnd="64dp"
-            android:layout_marginBottom="32dp"
-            android:text="Apontar produtos embalados"
-            android:textSize="20sp"
-            app:cornerRadius="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/apPerdas"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/saudacao" />
-
-        <Button
-            android:id="@+id/apPerdas"
-            style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-            android:layout_width="0dp"
-            android:layout_height="108dp"
-            android:layout_marginStart="64dp"
-            android:layout_marginEnd="64dp"
-            android:text="Apontar perdas de produtos"
-            android:textSize="20sp"
-            app:cornerRadius="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/apEmbalados" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/relatorio"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/CL"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="15dp"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="15dp"
-                android:src="@drawable/ic_baseline_checklist_24"
-                app:icon="@drawable/ic_baseline_checklist_24" />
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/syncBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginBottom="15dp"
-                android:text="Sincronizar"
-                app:icon="@drawable/ic_baseline_sync_24" />
-        </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/saudacao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bem-vindo"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@+id/trArmz"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <Button
+                    android:id="@+id/trArmz"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="64dp"
+                    android:layout_marginEnd="64dp"
+                    android:layout_marginBottom="32dp"
+                    android:text="Transferência de armazem"
+                    android:textSize="20sp"
+                    app:cornerRadius="10dp"
+                    app:layout_constraintBottom_toTopOf="@+id/apPerdas"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/saudacao" />
+
+                <Button
+                    android:id="@+id/apPerdas"
+                    style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="108dp"
+                    android:layout_marginStart="64dp"
+                    android:layout_marginEnd="64dp"
+                    android:text="Apontar perdas de produtos"
+                    android:textSize="20sp"
+                    android:visibility="gone"
+                    app:cornerRadius="10dp"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/trArmz" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/relatorio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:src="@drawable/ic_baseline_checklist_24"
+                        app:icon="@drawable/ic_baseline_checklist_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/syncBtn"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                        android:id="@+id/syncBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Sincronizar"
+                        app:icon="@drawable/ic_baseline_sync_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/relatorio"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

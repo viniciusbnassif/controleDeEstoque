@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TransferenciaDeArmazem">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/coordinatorLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="5dp"
+            android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/viewSpinnerArmzOrig"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Armazem de origem"
+                app:errorEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/viewSpinner"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerArmzOrigem"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoCorrect" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/viewSpinner"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Selecione o produto"
+                app:errorEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/viewSpinnerLote"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewSpinnerArmzOrig">
+
+                <TextView
+                    android:id="@+id/spinnerIdSaver"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone"></TextView>
+
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerPrd"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoCorrect" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/viewSpinnerLote"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Selecione o lote"
+                app:errorEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/textInputLayout17"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewSpinner">
+
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerLote"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoCorrect" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout17"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                app:errorEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/viewSpinnerArmzDest"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewSpinnerLote">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextEmbalagemCaixa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Quantidade a movimentar"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/viewSpinnerArmzDest"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Armazem de destino"
+                app:errorEnabled="true"
+                app:layout_constraintBottom_toTopOf="@+id/space"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayout17">
+
+                <AutoCompleteTextView
+                    android:id="@+id/spinnerArmzDest"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoCorrect" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <Space
+                android:id="@+id/space"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewSpinnerArmzDest"></Space>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:backgroundTint="#00FFFFFF"
+        android:foregroundTint="#00FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/apontEmbaladosBottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom"
+            android:background="@color/colorPrimary"
+            app:backgroundTint="@color/colorPrimary"
+            app:hideOnScroll="true"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp">
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab1"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="3dp"
+                android:elevation="15dp"
+                android:lines="2"
+                android:text="Finalizar e \n iniciar outro"
+                android:tooltipText="Finalizar"
+                app:icon="@drawable/ic_outline_library_add_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/fab2" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_margin="3dp"
+                android:text="@string/finalizar"
+                android:textSize="16sp"
+                android:tooltipText="Finalizar"
+                app:fabSize="normal"
+                app:icon="@drawable/ic_outline_library_add_check_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,14 +10,14 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:backgroundTint="@color/colorPrimary"
+        app:title="Relatório"
+        app:titleTextColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/colorPrimary"
-        app:backgroundTint="@color/colorPrimary"
-        app:title="Perdas atuais"
-        app:titleTextColor="@color/white">
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
