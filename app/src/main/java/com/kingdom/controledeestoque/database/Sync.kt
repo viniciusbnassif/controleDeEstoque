@@ -64,6 +64,7 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
             }catch (e: Exception){}
 
         }.await().toString()
+        //while (CoroutineScope(Dispatchers.IO).isActive = )
         return rtn
     }
 

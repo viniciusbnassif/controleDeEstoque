@@ -185,12 +185,12 @@ class SQLiteHelper(context: Context?):
         onCreate(db)
     }
 
-    fun getProdutos(): Cursor {
+    fun getArmz(): Cursor {
         return db.query(
-            TBL_PRODUTO,
-            arrayOf("$ID_PRODUTO AS ${BaseColumns._ID}",
-                COD_PROD,
-                DESC_PROD
+            TBL_ARMZ,
+            arrayOf("$ID_ARMZ AS ${BaseColumns._ID}",
+                COD_ARMZ,
+                DESC_ARMZ
             ),
             null /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
@@ -198,6 +198,57 @@ class SQLiteHelper(context: Context?):
             null /* HAVING CLAUSE, null if no HAVING clause */,
             null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
         )
+    }
+    fun getCodArmz(idArmz: String): Cursor? {
+        var cursor = db.query(
+            TBL_ARMZ,
+            arrayOf("$ID_ARMZ AS ${BaseColumns._ID}",
+                COD_ARMZ,
+                DESC_ARMZ
+            ),
+            "$ID_ARMZ = $idArmz" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
+    }
+
+    fun getPrd(): Cursor {
+        return db.query(
+            TBL_PRODUTO,
+            arrayOf("$ID_PRODUTO AS ${BaseColumns._ID}",
+                COD_PROD,
+                DESC_PROD,
+                UNID_PROD
+            ),
+            null /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+    }
+    fun getCodPrd(idPrd: String): Cursor? {
+        var cursor = db.query(
+            TBL_PRODUTO,
+            arrayOf("$ID_PRODUTO AS ${BaseColumns._ID}",
+                COD_PROD
+            ),
+            "$ID_PRODUTO = $idPrd" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
     }
 
     fun getDetailProdutos(idPrd: Int): Cursor {
@@ -238,6 +289,106 @@ class SQLiteHelper(context: Context?):
 
     }
 
+    fun getLote(armzOrig: String, codProd: String): Cursor? {
+        var cursor = db.query(
+            TBL_SALDOLOTE,
+            arrayOf(
+                "$ID_SL AS ${BaseColumns._ID}",
+                LOTE,
+                SALDO_LOTE
+            ),
+            "$COD_ARMZ = '$armzOrig' AND $COD_PROD = '$codProd'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
+    }
+
+    fun getSaldo(armzOrig: String, codProd: String): Cursor? {
+        var cursor = db.query(
+            TBL_SALDO,
+            arrayOf(
+                "$ID_SALDO AS ${BaseColumns._ID}",
+                SALDO
+            ),
+            "$COD_ARMZ = '$armzOrig' AND $COD_PROD = '$codProd'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
+    }
+
+    fun getRastro(codProd: String): Boolean {
+        var cursor = db.query(
+            TBL_PRODUTO,
+            arrayOf(
+                "$ID_PRODUTO AS ${BaseColumns._ID}",
+                RASTRO_PROD
+            ),
+            "$COD_PROD = '$codProd'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return false
+        } else if (cursor.getString(1) == "L") {
+            return true
+        }
+        return false
+    }
+
+    fun getInternalMovimento(): Cursor? {
+        var cursor = db.query(
+            TBL_MOVIM,
+            arrayOf(
+                "$ID_MOVIM AS ${BaseColumns._ID}",
+                ARMZ_ORIG,
+                COD_PROD,
+                LOTE,
+                QTD_MOVIM,
+                ARMZ_DEST,
+                USERNAME,
+                STATUS_SYNC
+            ),
+            "$STATUS_SYNC = 0" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
+    }
+    /*fun getInternalMovimento(): Cursor? {
+        val selectQuery =
+            "SELECT $ID_MOVIM, " +
+                    "$ARMZ_ORIG, " +
+                    "$COD_PROD, " +
+                    "$LOTE," +
+                    "$QTD_MOVIM, " +
+                    "$ARMZ_DEST, " +
+                    "$USERNAME," +
+                    "$STATUS_SYNC  " +
+                    "FROM $TBL_MOVIM WHERES $STATUS_SYNC = 0;"
+        val result = db.rawQuery(selectQuery, null)
+        return result
+    }*/
+
+
     /*fun getDescMotivo(idMtv: Int): Cursor? {
         var cursor = db.query(
             TBL_MOTIVO,
@@ -258,27 +409,7 @@ class SQLiteHelper(context: Context?):
 
     }
 
-    fun getAE(): Cursor? {
-        val selectQuery =
-            "SELECT $ID_AE, " +
-                    "$QTD_AE, " +
-                    "$TIPO_AE, " +
-                    "$DATA_AE," +
-                    "$LOTE_AE, " +
-                    "$CAIXA_AE, " +
-                    "$UNID_AE, " +
-                    "$VALID_AE, " +
-                    "$TOTAL, " +
-                    "$ID_PRODUTO, " +
-                    "$QE_PROD, " +
-                    "$VALID_PROD, " +
-                    "$TIPOV_PROD, " +
-                    "$USERNAME, " +
-                    "$STATUS_SYNC_AE " +
-                    "FROM $TBL_APONTEMBALADO WHERE $STATUS_SYNC_AE = 0;"
-        val result = db.rawQuery(selectQuery, null)
-        return result
-    }
+
 
     fun getAP(): Cursor? {
         val selectQuery =

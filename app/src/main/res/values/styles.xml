@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="buttonBottomBar">
+        style="?attr/materialButtonOutlinedStyle"
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="backgroundTint">@color/color_0</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="icon">@drawable/ic_outline_library_add_24</item>
+        <item name="iconSize">@drawable/ic_outline_library_add_24</item>
+        <item name="iconTint">@drawable/ic_outline_library_add_24</item>
+        <item name="strokeColor">#00FFFFFF</item>
+    </style>
+</resources>

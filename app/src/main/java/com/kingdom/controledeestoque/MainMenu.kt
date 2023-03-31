@@ -4,11 +4,14 @@ package com.kingdom.controledeestoque
 //import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
+import android.net.http.SslCertificate.saveState
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.AlarmClock
+import android.provider.Settings
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -26,10 +29,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.*
 
+
 class MainMenu : AppCompatActivity(), LifecycleEventObserver {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
+
+
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
@@ -38,14 +44,13 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
             // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
             // a general rule, you should design your app to hide the status bar whenever you
             // hide the navigation bar.
-            systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            systemUiVisibility =
+                View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
 
 
-
-
         var relatorio = findViewById<FloatingActionButton>(R.id.relatorio)
-        relatorio.setOnClickListener{
+        relatorio.setOnClickListener {
             var estatistica = Intent(this, Relatorio::class.java)
             startActivity(estatistica)
         }
@@ -65,28 +70,63 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
         var coordinator = findViewById<ConstraintLayout>(R.id.parent)
         var cl = findViewById<ConstraintLayout>(R.id.CL)
 
-        var progressTB = findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.progressToolbar)
+        var progressTB =
+            findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.progressToolbar)
         val buttonTrArmz: Button = findViewById(R.id.trArmz)
         var syncBtn = findViewById<ExtendedFloatingActionButton>(R.id.syncBtn)
 
-        fun showProgress(result: String){
+        fun showProgress(result: String) {
             if (result == "true") {
                 progressTB.setVisibility(View.VISIBLE)
                 syncBtn.setEnabled(false)
+                syncBtn.setText("Sincronizando")
                 buttonTrArmz.setEnabled(false)
                 buttonTrArmz.text = "Aguarde a sincronização ser concluída"
             } else if (result == "false") {
                 progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
+                syncBtn.setText("Sincronizar")
                 buttonTrArmz.setEnabled(true)
                 buttonTrArmz.setText("Transferência de armazem")
+            } else if (result == "syncFail") {
+                progressTB.setVisibility(View.INVISIBLE)
+                syncBtn.setEnabled(true)
+                syncBtn.setText("Falha ao sincronizar")
+                buttonTrArmz.setEnabled(false)
+                buttonTrArmz.setText("Falha ao sincronizar")
+
+                MaterialAlertDialogBuilder(this)
+                    .setIcon(R.drawable.ic_baseline_sync_problem_24)
+                    .setTitle("Ocorreu um erro durante a sincronização")
+                    .setMessage("A conexão foi interrompida durante a sincronização e suas alterações podem não ter sido salvas! \nVerifique as configurações ou reinicie o aplicativo e tente novamente")
+                    .setPositiveButton("Tentar novamente") { dialog, which ->
+                        try {
+                            syncBtn.performClick()
+                        } catch (e: Exception) {
+                        }
+                        dialog.dismiss()
+                    }
+                    .setNeutralButton("Abrir Configs.") { dialog, which ->
+                        startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                        showProgress("syncFail")
+                    }
+                    .setNegativeButton("Fechar aplicativo") { dialog, which ->
+                        finish()
+                    }
+
+                    .setCancelable(false)
+                    .show()
+
             }
         }
+
+
+
 
         fun postConnectionView(result: String) {
             MainScope().launch(CoroutineName("MainMenu")) {
                 try {
-                    if (result == "Falha") {
+                    if (result == "Falha" || result == "") {
                         val snackbar = Snackbar.make(
                             findViewById(R.id.CL),
                             "Não foi possível estabelecer uma conexão com o servidor",
@@ -95,12 +135,12 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                             .setActionTextColor(
                                 Color.WHITE
                             ).setAction("OK") {}.show()
-                    } else if (result == "Sem Conexão" || result == "") {
+                    } else if (result == "Sem Conexão") {
                         showProgress("false")
                         Snackbar.make(
                             findViewById(R.id.CL),
                             "Não foi possível estabelecer uma conexão com o servidor (Endereço e porta indisponíveis para esta rede)",
-                            Snackbar.LENGTH_INDEFINITE
+                            Snackbar.LENGTH_LONG
                         ).setBackgroundTint(Color.parseColor("#E3B30C")).setTextColor(Color.WHITE)
                             .setActionTextColor(
                                 Color.WHITE
@@ -109,39 +149,46 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                         Snackbar.make(
                             findViewById(R.id.CL),
                             "Sincronizado com sucesso!",
-                            Snackbar.LENGTH_LONG
+                            Snackbar.LENGTH_SHORT
                         ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
                             .setActionTextColor(
                                 Color.WHITE
                             ).setAction("OK") {}.show()
                     }
-                }catch (e: Exception){Log.d("postConnectionView", e.toString())}
+                } catch (e: Exception) {
+                    Log.d("postConnectionView", e.toString())
+                }
+                showProgress("false")
             }
         }
 
-        suspend fun connectionView(){
+
+        suspend fun connectionView() {
             var result = ""
 
-            CoroutineScope(Dispatchers.IO).launch(CoroutineName("testConnectionMM")) {
+            //CoroutineScope(Dispatchers.IO).async(CoroutineName("testConnectionMM")) {
+            CoroutineScope(CoroutineName("testConnectionMM")).async(Dispatchers.Unconfined) {
                 try {
                     if (Looper.myLooper() == null) {
                         Looper.prepare()
                     }
                     result = Sync().testConnection()
-                    Log.d("ConnectionView result", result)
 
-                } catch (e: Exception){
+                    Log.d("ConnectionView result", result)
+                    postConnectionView(result)
+
+                } catch (e: Exception) {
                     Log.d("connectionView", e.toString())
                 }
 
                 Log.d("ConnectionView result2", result)
                 //return result
-                postConnectionView(result)
-
+                MainScope().launch {
+                    postConnectionView(result)
+                }
             }
 
             //Log.d("ConnectionView rtn", rtn)
-
 
 
             //postConnectionView(rtn)
@@ -149,22 +196,15 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Unconfined).launch {
             connectionView()
         }
-
-
-
-
-
 
 
         //var sync = parseInt("")
 
 
-
-
-        fun postSyncSuccess(){
+        fun postSyncSuccess() {
             Snackbar.make(
                 cl,
                 "Sincronizado com sucesso!",
@@ -177,7 +217,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 try {
                     showProgress("false")
                     Log.d("run?", "run?")
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     Log.d("run e?", e.toString())
                 }
             }
@@ -192,15 +232,14 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 try {
                     showProgress("true")
                     Log.d("run?", "run?")
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     Log.d("run e?", e.toString())
                 }
             }.await()
 
 
-
             //var global = LifecycleEventObserver()
-            CoroutineScope(CoroutineName("SyncMainMenu")).async(Dispatchers.Unconfined){ // <------------------------------------------------
+            CoroutineScope(CoroutineName("SyncMainMenu")).async(Dispatchers.Unconfined) { // <------------------------------------------------
 
                 var msgrtn = ""
                 try {
@@ -209,33 +248,32 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                     }
                     var thisHandler = Handler()
                     msgrtn = Sync().sync(0, ctxt)
-                } catch (e: Exception){
-                    Log.d("MainMenu", e.toString())}
+                } catch (e: Exception) {
+                    Log.d("MainMenu", e.toString())
+                    MainScope().async {
+                        showProgress("syncFail")
+                    }
+
+                }
                 if (msgrtn == "Sucesso") {
-                    MainScope().run{postSyncSuccess()}
+                    MainScope().run { postSyncSuccess() }
 
-                } else if (msgrtn == "Falha" ||  msgrtn == "") {
-                    MainScope().run{connectionView()}
-
+                } else if (msgrtn == "Falha") {
+                    connectionView()
+                    cancel()
                 }
                 //cancel()
             }
         }
 
-
-
-
-
         syncBtn.setOnClickListener {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.Unconfined) {
                 try {
                     synchronization()
-                }
-                catch (e: Exception) {
+                } catch (e: Exception) {
                 }
             }
         }
-
 
 
         val username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE)
@@ -249,10 +287,10 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
         buttonTrArmz.setOnClickListener {
             intent = Intent(this, TransferenciaDeArmazem::class.java)
                 .apply {
-                    putExtra(AlarmClock.EXTRA_MESSAGE, username)}
+                    putExtra(AlarmClock.EXTRA_MESSAGE, username)
+                }
             startActivity(intent)
         }
-
 
 
         val buttonAP: Button = findViewById(R.id.apPerdas)
@@ -263,6 +301,13 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
             startActivity(intent)*/
         }
     }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
+
+
+
+
 
 
     //var btnSync = findViewById<MaterialButton>(R.id.syncBtn)

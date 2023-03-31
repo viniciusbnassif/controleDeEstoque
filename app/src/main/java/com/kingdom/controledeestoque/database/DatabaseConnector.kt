@@ -264,14 +264,11 @@ fun getSlLote(context: Context?) {
     }
 }
 
-
-
-/*fun queryExternalServerAE(context: Context) {
+fun queryExternalServerAE(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
 
-    var result = dbIntrn.getAE()
+    var result = dbIntrn.getInternalMovimento()
     var localResult = result
-
 
     connect().use {
 
@@ -281,20 +278,16 @@ fun getSlLote(context: Context?) {
             do {
                 var id = localResult.getInt(0)
 
-                var produto = dbIntrn.getDescProdutos(localResult.getInt(9))
-                var produtoDesc = produto!!.getString(1)
-                Log.d("ProdDesc", "$produtoDesc")
+                //var produto = dbIntrn.getDescProdutos(localResult.getInt(9))
+                //var produtoDesc = produto!!.getString(1)
+                //Log.d("ProdDesc", "$produtoDesc")
                 try {
 
                     var insert = (
                         """
-                        INSERT INTO ApontEmbalado 
-                        (qtdApontada, tipoUnitizador, dataHoraApontamento, lote, caixaAvulsa, unidadeAvulsa, validade, total, produto, qeProduto, validProduto, tipoVProduto, username)
-                        VALUES
-                        (${localResult.getInt(1)}, '${localResult.getString(2)}', '${localResult.getString(3)}', ${localResult.getInt(4)},
-                         ${localResult.getInt(5)}, ${localResult.getInt(6)}, '${localResult.getString(7)}', ${localResult.getInt(8)},
-                         '${produtoDesc}', ${localResult.getInt(10)}, ${localResult.getInt(11)}, '${localResult.getString(12)}', 
-                         '${localResult.getString(13)}');
+                        INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, username) " +
+                                    "VALUES ('${localResult.getString(1)}', '${localResult.getString(2)}', '${localResult.getString(3)}', 
+                                    ${localResult.getFloat(4)}, '${localResult.getString(5)}', '${localResult.getString(6)}')
                         """.trimIndent())
                     Log.d("Debugggggg", insert)
 
@@ -307,7 +300,7 @@ fun getSlLote(context: Context?) {
                 catch (se: SQLException){
                     Log.e("Error SQLE", se.toString())
                 }
-                dbIntrn.insertDone("ApontEmbalado", id)
+                dbIntrn.insertDone(id)
 
                 //result.moveToNext()
             }while (localResult.moveToNext())
@@ -325,7 +318,7 @@ fun getSlLote(context: Context?) {
         }
 }
 
-fun queryExternalServerAP(context: Context) {
+/*fun queryExternalServerAP(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
 
     var result = dbIntrn.getAP()

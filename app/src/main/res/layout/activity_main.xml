@@ -124,7 +124,6 @@
                     android:insetLeft="4dp"
                     android:insetTop="5dp"
                     android:insetBottom="0dp"
-                    android:onClick="progressVisibility"
                     android:text="Entrar"
                     app:cornerRadius="5dp"
                     app:layout_constraintBottom_toBottomOf="@id/viewPassword"
