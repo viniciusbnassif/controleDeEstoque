@@ -84,14 +84,21 @@
                     style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:enabled="false"
                     android:hint="Selecione o lote"
                     app:layout_constraintBottom_toTopOf="@+id/textInputLayout17"
-                    app:layout_constraintEnd_toStartOf="@+id/obrigatorioIcon"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/viewSpinner">
 
                     <TextView
                         android:id="@+id/spinnerCodLote"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/saldoLote"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone" />
@@ -104,21 +111,6 @@
                         android:inputType="none|text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <ImageView
-                    android:id="@+id/obrigatorioIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginBottom="22dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/viewSpinnerLote"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/viewSpinnerLote"
-                    app:layout_constraintTop_toTopOf="@+id/viewSpinnerLote"
-                    app:srcCompat="@drawable/ic_baseline_info_24"
-                    app:tint="@color/suErrorRed" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/textInputLayout17"

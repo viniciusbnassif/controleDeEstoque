@@ -1,18 +1,24 @@
 package com.kingdom.controledeestoque
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.AlarmClock
+import android.provider.Settings
 import android.text.TextUtils.substring
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.kingdom.controledeestoque.SQLiteHelper
 import com.kingdom.controledeestoque.database.Connection
+import kotlinx.coroutines.MainScope
 import java.lang.Float.parseFloat
+import java.lang.Integer.parseInt
 
 class TransferenciaDeArmazem : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +64,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         var spnPrd = findViewById<AutoCompleteTextView>(R.id.spinnerPrd)
 
         var spinnerCodLote = findViewById<TextView>(R.id.spinnerCodPrd)
+        var saldoLote = findViewById<TextView>(R.id.saldoLote)
         var viewSpnLote = findViewById<TextInputLayout>(R.id.viewSpinnerLote)
         var spnLote = findViewById<AutoCompleteTextView>(R.id.spinnerLote)
 
@@ -87,17 +94,25 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var codArmzOrig = spinnerCodArmzOrig.text.toString()
             //var cursorArmzOg = db.getCodArmz(idArmzOrig as String)
             var codPrd = spinnerCodPrd.text.toString()
+            var cursorArray = ArrayList<Any>()
             //var cursorPrd = db.getCodPrd(idPrd as String)
+
             if (codArmzOrig.length > 0 && codPrd.length > 0) {
                 var cursorLote = db.getLote("$codArmzOrig", "$codPrd")
 
-                var cursorArray = ArrayList<Any>()
+
                 if (cursorLote != null) {
                     cursorLote.moveToFirst()
                     cursorArray.add(cursorLote.getString(1) + " - Saldo: " + "${cursorLote.getFloat(2)}")
                     while (cursorLote.moveToNext()) {
                         cursorArray.add(cursorLote.getString(1) + " - Saldo: " + "${cursorLote.getFloat(2)}")
                     }
+                    viewSpnLote.error = getString(R.string.campo_obrigatorio)
+                    viewSpnLote.isEnabled = true
+                } else {
+                    viewSpnLote.error = ""
+                    viewSpnLote.isErrorEnabled = false
+                    viewSpnLote.isEnabled = false
                 }
                 var simpleCursorAdapter =
                     ArrayAdapter<Any>(this, android.R.layout.simple_dropdown_item_1line, cursorArray)
@@ -107,7 +122,6 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             rastro = db.getRastro("$codPrd")
             if (rastro == true) {
                 viewSpnLote.error = getString(R.string.campo_obrigatorio)
-                viewSpnLote.isEnabled = true
 
             } else if (rastro == false){
                 viewSpnLote.error = ""
@@ -123,8 +137,17 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                         idLote = _id.toInt().toString()
                     }
                     spinnerCodLote.text = spnLote.text.substring(0,10)
+                    saldoLote.text = spnLote.text.substring(20)
                     saldoProduto()
                 }
+            spnLote.setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus == false){
+                    if (!cursorArray.contains(spnLote.text.toString())) {
+                        spnLote.setText("")
+                        setOrRefreshSpnLote()
+                    }
+                }
+            }
         }
 
         fun setOrRefreshSpnArmzOrig() {
@@ -198,6 +221,14 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                         //}
                     }
                 }
+            spnPrd.setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus == false){
+                    if (!cursorArray.contains(spnPrd.text.toString())) {
+                        spnPrd.setText("")
+                        setOrRefreshSpnPrd()
+                    }
+                }
+            }
         }
 
 
@@ -230,37 +261,24 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
                     }
                 }
+            spnArmzDest.setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus == false){
+                    if (!cursorArray.contains(spnArmzDest.text.toString())) {
+                        spnArmzDest.setText("")
+                        setOrRefreshSpnArmzDest()
+                    }
+                }
+            }
         }
 
         setOrRefreshSpnArmzOrig()
         setOrRefreshSpnPrd()
         setOrRefreshSpnArmzDest()
 
-        fun salvar(){
+        fun salvar(): AlertDialog? {
             var query = ""
             var message = ""
             rastro = db.getRastro(spinnerCodPrd.text.toString())
-
-            if (spinnerCodArmzOrig.length() == 0){
-                message += "Armazem origem, "
-            }
-            if (spinnerCodPrd.length() == 0){
-                message += "\nproduto, "
-            }
-            if (rastro == true) {
-                if (spinnerCodLote.length() == 0){
-                    message += "\nlote, "
-                }
-            } else
-
-            if (spinnerCodPrd.length() == 0){
-                message += "\nproduto, "
-            }
-            if (spinnerCodPrd.length() == 0){
-                message += "\nproduto, "
-            }
-
-
 
 
             var armzOrig = spinnerCodArmzOrig.text
@@ -270,6 +288,58 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var armzDest = spinnerCodArmzDest.text
 
 
+            if (spinnerCodArmzOrig.text.isEmpty()){
+                message += "- Armazem origem; "
+            }
+            if (spinnerCodPrd.text.isEmpty()){
+                message += "\n- Produto; "
+            }
+            if (rastro == true) {
+                if (spinnerCodLote.text.isEmpty()) {
+                    message += "\n- Lote; "
+                }
+            }
+
+            if (movimento.text?.isEmpty()!!){
+                message += "\n- Quantidade a movimentar; "
+            } else {
+
+                var movimentoresult = parseFloat(movimento.text.toString())
+                var saldoLoteResult = parseFloat(saldoLote.text.toString())
+                var saldoLoteResult2 = parseFloat(saldoLote.text.toString())
+                if (movimentoresult > saldoLoteResult){
+                    movimento.setText("")
+                    var showMessage = MaterialAlertDialogBuilder(this)
+                        .setTitle("Você está tentando movimentar uma quantidade maior que existe no lote.")
+                        .setMessage("Verifique o valor de saldo no campo lote.")
+                        .setPositiveButton("Fechar") { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setCancelable(false)
+                    return showMessage.show()
+                }
+            }
+            if (spnArmzDest.text.isEmpty()){
+                message += "\n- Armazem de destino; "
+            }
+            var showMessage = MaterialAlertDialogBuilder(this)
+                .setIcon(R.drawable.ic_baseline_sync_problem_24)
+                .setTitle("Existem campos não preenchidos.")
+                .setMessage("Verifique os campos a seguir: \n $message")
+                .setPositiveButton("Fechar") { dialog, which ->
+                    dialog.dismiss()
+                }
+                .setCancelable(false)
+            if (message.length >0) {
+                return showMessage.show()
+            }
+
+
+
+
+
+
+
 
 
 
@@ -277,13 +347,15 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                                     "VALUES ('$armzOrig', '$prod', '$lote', ${qtdMovimento}, '$armzDest', '$username', 0)"
             db.externalExecSQL(query)
             //Connection().sendMovimento()
+            Log.d("Debug completed??", "true, apparently")
+            return null
 
         }
 
 
         var finalizarBtn = findViewById<Button>(R.id.finalizar)
         finalizarBtn.setOnClickListener {
-            salvar()
+            MainScope().run {  salvar() }
             finish()
         }
         var salvarBtn = findViewById<Button>(R.id.finalizar)
