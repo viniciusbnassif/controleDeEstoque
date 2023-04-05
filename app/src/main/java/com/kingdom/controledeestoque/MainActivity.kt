@@ -78,14 +78,13 @@ class MainActivity : AppCompatActivity() {
 
 
         fun syncIsDone(){
+
             var mainMenu = Intent(this, MainMenu::class.java).apply {
                 putExtra(AlarmClock.EXTRA_MESSAGE, user.text.toString())
             }
             startActivity(mainMenu)
 
             finish()
-
-
         }
 
 
@@ -179,15 +178,22 @@ class MainActivity : AppCompatActivity() {
                     var username = user.text.toString()
                     //var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
                     //progress.visibility = VISIBLE
-                    CoroutineScope(Dispatchers.IO).launch(CoroutineName("SyncMainActivity")) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    CoroutineScope(CoroutineName("SyncMainActivity")).async(Dispatchers.Unconfined) {
+                        try {
+                            if (Looper.myLooper() == null) {
+                                Looper.prepare()
+                            }
+                    /*CoroutineScope(Dispatchers.IO).launch(CoroutineName("SyncMainActivity")) {
                         try {
                             Looper.prepare()
-                            Looper.myLooper()
+                            Looper.myLooper()*/
                             sync.sync(0, ctxt)
                             Looper.myLooper()?.quit()
-                        } catch (e: Exception){}
+                        } catch (e: Exception){
+                            Log.d("SyncMainActivity (Thread)", e.toString())
+                        }
                         syncIsDone()
-                        finish()
                         cancel()
                     }
 
@@ -224,6 +230,7 @@ class MainActivity : AppCompatActivity() {
                     ).setAction("Abrir Configurações") {
                         startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
                     }.show()
+                    showProgress("false")
                 }
             }
         }

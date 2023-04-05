@@ -1,8 +1,10 @@
 package com.kingdom.controledeestoque
 
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.provider.AlarmClock
 import android.provider.Settings
 import android.text.TextUtils.substring
@@ -11,14 +13,21 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.kingdom.controledeestoque.SQLiteHelper
 import com.kingdom.controledeestoque.database.Connection
-import kotlinx.coroutines.MainScope
+import com.kingdom.controledeestoque.database.Sync
+import kotlinx.coroutines.*
 import java.lang.Float.parseFloat
 import java.lang.Integer.parseInt
+import java.util.*
+import kotlin.collections.ArrayList
 
 class TransferenciaDeArmazem : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +40,22 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             // a general rule, you should design your app to hide the status bar whenever you
             // hide the navigation bar.
             systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        }
+
+        var bottomAppBar = findViewById<BottomAppBar>(R.id.bottomAppBar)
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView.rootView) { _, insets ->
+
+            //This lambda block will be called, every time keyboard is opened or closed
+
+
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            if(imeVisible){
+                bottomAppBar.isVisible = false
+            } else {
+                bottomAppBar.isVisible = true
+            }
+
+            insets
         }
 
         val toolbar = findViewById<Toolbar>(R.id.bottomAppBar)
@@ -54,6 +79,11 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
 
 
+        val dateFormatter = SimpleDateFormat("yyyyMMddkk:mm")
+        val dty = dateFormatter.format(Date())
+
+
+
         var spinnerCodArmzOrig = findViewById<TextView>(R.id.spinnerCodArmzOrig)
         var spnArmzOrig = findViewById<AutoCompleteTextView>(R.id.spinnerArmzOrigem)
 
@@ -63,7 +93,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         var spinnerCodPrd = findViewById<TextView>(R.id.spinnerCodPrd)
         var spnPrd = findViewById<AutoCompleteTextView>(R.id.spinnerPrd)
 
-        var spinnerCodLote = findViewById<TextView>(R.id.spinnerCodPrd)
+        var spinnerCodLote = findViewById<TextView>(R.id.spinnerCodLote)
         var saldoLote = findViewById<TextView>(R.id.saldoLote)
         var viewSpnLote = findViewById<TextInputLayout>(R.id.viewSpinnerLote)
         var spnLote = findViewById<AutoCompleteTextView>(R.id.spinnerLote)
@@ -144,6 +174,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 if (hasFocus == false){
                     if (!cursorArray.contains(spnLote.text.toString())) {
                         spnLote.setText("")
+                        spinnerCodLote.setText("")
                         setOrRefreshSpnLote()
                     }
                 }
@@ -182,6 +213,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 if (hasFocus == false){
                     if (!cursorArray.contains(spnArmzOrig.text.toString())) {
                         spnArmzOrig.setText("")
+                        spinnerCodArmzOrig.setText("")
                         setOrRefreshSpnArmzOrig()
                     }
                 }
@@ -225,6 +257,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 if (hasFocus == false){
                     if (!cursorArray.contains(spnPrd.text.toString())) {
                         spnPrd.setText("")
+                        spinnerCodPrd.setText("")
                         setOrRefreshSpnPrd()
                     }
                 }
@@ -253,7 +286,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             spnArmzDest.onItemClickListener =
                 AdapterView.OnItemClickListener { p0, view, position, _id ->
                     if (view?.context != null) {
-                        spinnerCodArmzOrig.text = spnArmzOrig.text.substring(0,2)
+                        spinnerCodArmzDest.text = spnArmzDest.text.substring(0,2)
                         if (spinnerCodArmzDest.length() > 0 && spinnerCodPrd.length() > 0) {
                             Log.d("setOrRefreshSpnLote", "run? 1")
                         }
@@ -265,6 +298,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 if (hasFocus == false){
                     if (!cursorArray.contains(spnArmzDest.text.toString())) {
                         spnArmzDest.setText("")
+                        spinnerCodArmzDest.setText("")
                         setOrRefreshSpnArmzDest()
                     }
                 }
@@ -278,13 +312,13 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         fun salvar(): AlertDialog? {
             var query = ""
             var message = ""
-            rastro = db.getRastro(spinnerCodPrd.text.toString())
+            var rastro = db.getRastro(spinnerCodPrd?.text.toString())
 
 
             var armzOrig = spinnerCodArmzOrig.text
             var prod = spinnerCodPrd.text
             var lote = spinnerCodLote.text
-            var qtdMovimento = parseFloat(movimento.text.toString())
+            var qtdMovimento = if(!movimento.text.isNullOrEmpty()){parseFloat(movimento.text.toString())} else {0}
             var armzDest = spinnerCodArmzDest.text
 
 
@@ -294,10 +328,8 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             if (spinnerCodPrd.text.isEmpty()){
                 message += "\n- Produto; "
             }
-            if (rastro == true) {
-                if (spinnerCodLote.text.isEmpty()) {
-                    message += "\n- Lote; "
-                }
+            if (rastro && spinnerCodLote.text.isEmpty()) {
+                message += "\n- Lote; "
             }
 
             if (movimento.text?.isEmpty()!!){
@@ -306,7 +338,6 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
                 var movimentoresult = parseFloat(movimento.text.toString())
                 var saldoLoteResult = parseFloat(saldoLote.text.toString())
-                var saldoLoteResult2 = parseFloat(saldoLote.text.toString())
                 if (movimentoresult > saldoLoteResult){
                     movimento.setText("")
                     var showMessage = MaterialAlertDialogBuilder(this)
@@ -323,9 +354,9 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 message += "\n- Armazem de destino; "
             }
             var showMessage = MaterialAlertDialogBuilder(this)
-                .setIcon(R.drawable.ic_baseline_sync_problem_24)
+                .setIcon(R.drawable.ic_baseline_deselect_24_black)
                 .setTitle("Existem campos não preenchidos.")
-                .setMessage("Verifique os campos a seguir: \n $message")
+                .setMessage("\bVerifique os campos a seguir: \n$message")
                 .setPositiveButton("Fechar") { dialog, which ->
                     dialog.dismiss()
                 }
@@ -333,21 +364,25 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             if (message.length >0) {
                 return showMessage.show()
             }
-
-
-
-
-
-
-
-
-
-
-            query = "INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, username, statusSync) " +
-                                    "VALUES ('$armzOrig', '$prod', '$lote', ${qtdMovimento}, '$armzDest', '$username', 0)"
-            db.externalExecSQL(query)
-            //Connection().sendMovimento()
-            Log.d("Debug completed??", "true, apparently")
+            else if(rastro != null || !armzOrig.isNullOrEmpty() || !prod.isNullOrEmpty() || !lote.isNullOrEmpty() || qtdMovimento != 0 || !armzDest.isNullOrEmpty() || !username.isNullOrEmpty()){
+                query =
+                    "INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, dataHora, username, statusSync) " +
+                            "VALUES ('$armzOrig', '$prod', '$lote', ${qtdMovimento}, '$armzDest', '$dty', '$username', 0)"
+                db.externalExecSQL(query)
+                //Connection().sendMovimento()
+                Log.d("Debug completed??", "true, apparently")
+             }
+            var ctxt = this
+            CoroutineScope(CoroutineName("syncMovimento")).launch(Dispatchers.Unconfined) {
+                try {
+                    Log.d("Seek then out", "true, apparently")
+                    if (Looper.myLooper() == null) {
+                        Looper.prepare()
+                    }
+                    Sync().sync(1, ctxt)
+                } catch (e: Exception){}
+                cancel()
+            }
             return null
 
         }
@@ -355,7 +390,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
         var finalizarBtn = findViewById<Button>(R.id.finalizar)
         finalizarBtn.setOnClickListener {
-            MainScope().run {  salvar() }
+            salvar()
             finish()
         }
         var salvarBtn = findViewById<Button>(R.id.finalizar)
@@ -363,11 +398,9 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             salvar()
             //limpar campos aqui
         }
-
     }
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
-
 }

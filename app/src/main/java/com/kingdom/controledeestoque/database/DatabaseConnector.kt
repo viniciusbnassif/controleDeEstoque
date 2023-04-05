@@ -264,7 +264,48 @@ fun getSlLote(context: Context?) {
     }
 }
 
-fun queryExternalServerAE(context: Context) {
+fun getNotificacao(context: Context?) {
+
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+
+    var count = 0
+
+    val tbl = "Notificacao"
+    val id = "idNotificacao"
+    val msg = "mensagem"
+    val data = "dataHora"
+    val dados = "dadosLancamento"
+    val user = "username"
+    val lido = "lido"
+
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
+            """
+            SELECT *
+              FROM $tbl
+             ORDER BY $id
+            """.trimIndent()
+        )
+        dbIntrn.externalExecSQL("DELETE FROM $tbl")
+        while (resultSet1.next()){
+            count += 1
+            var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
+                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
+                    "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
+            dbIntrn.externalExecSQL(query)
+            Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
+        }
+
+        resultSet1.close()
+        st1.close()
+
+    }
+}
+
+fun movimentoToServer(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
 
     var result = dbIntrn.getInternalMovimento()
@@ -285,22 +326,21 @@ fun queryExternalServerAE(context: Context) {
 
                     var insert = (
                         """
-                        INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, username) " +
-                                    "VALUES ('${localResult.getString(1)}', '${localResult.getString(2)}', '${localResult.getString(3)}', 
-                                    ${localResult.getFloat(4)}, '${localResult.getString(5)}', '${localResult.getString(6)}')
+                        INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, dataHora, username) VALUES ('${localResult.getString(1)}', '${localResult.getString(2)}', '${localResult.getString(3)}', 
+                                    ${localResult.getFloat(4)}, '${localResult.getString(5)}', '${localResult.getString(6)}', '${localResult.getString(7)}')
                         """.trimIndent())
                     Log.d("Debugggggg", insert)
 
                     var comm = st1.connection.prepareStatement(insert)
                     comm.executeUpdate()
                     //comm.connection.commit()
+                    dbIntrn.insertDone(id)
                 } catch (e: ClassNotFoundException){
                     Log.e("Error SQL CNFE", e.toString())
                 }
                 catch (se: SQLException){
                     Log.e("Error SQLE", se.toString())
                 }
-                dbIntrn.insertDone(id)
 
                 //result.moveToNext()
             }while (localResult.moveToNext())
@@ -315,7 +355,7 @@ fun queryExternalServerAE(context: Context) {
         }
         st1.close()
         connect()?.close()
-        }
+    }
 }
 
 /*fun queryExternalServerAP(context: Context) {

@@ -84,6 +84,18 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
 
             if (result == "Sucesso") {
                 if (cod == 0 || cod == 1) {
+
+                    movimentoToServer(ctxt)
+                    //queryExternalServerAE(ctxt)
+                    //queryExternalServerAP(ctxt)
+                    if (cod == 1) {
+                        message = "Sucesso" //Sincronizado com sucesso
+                        return message
+                    }
+                }
+                if (cod == 0 || cod == 1 || cod == 2) {
+
+                    getNotificacao(ctxt)
                     //queryExternalServerAE(ctxt)
                     //queryExternalServerAP(ctxt)
                     if (cod == 1) {
@@ -92,6 +104,7 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
                     }
                 }
                 if (cod == 0) {
+
                     getProdutoExt(ctxt)
                     getArmz(ctxt)
                     getSaldo(ctxt)
@@ -161,8 +174,9 @@ class LoadContent: AppCompatActivity(){
     suspend fun loadContent(ctxt: android.content.Context): String{
 
 
-        var message =
+        var message : String = CoroutineScope(Dispatchers.Unconfined).run {
             Sync().sync(0, ctxt)
+        }
 
 
         return message

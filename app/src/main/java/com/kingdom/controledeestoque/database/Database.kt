@@ -65,11 +65,20 @@ class SQLiteHelper(context: Context?):
         /*========================================================================*/
 
         private const val TBL_MOVIM = "Movimento"
-        private const val ID_MOVIM = "idSync"
+        private const val ID_MOVIM = "idMovimento"
         private const val ARMZ_ORIG = "armazemOrigem"
         private const val QTD_MOVIM = "qtdMovimento"
         private const val ARMZ_DEST = "armazemDestino"
+        private const val DATAHORA = "dataHora"
         private const val STATUS_SYNC = "statusSync"
+
+        /*========================================================================*/
+
+        private const val TBL_NOTIF = "Notificacao"
+        private const val ID_NOTIF = "idNotificacao"
+        private const val MENSG = "mensagem"
+        private const val DADOS_LCM = "dadosLancamento"
+        private const val LIDO = "lido"
 
         /*========================================================================*/
 
@@ -123,12 +132,22 @@ class SQLiteHelper(context: Context?):
                         LOTE + " VARCHAR(10), " + //CAMPO OPCIONAL (SERÁ VAZIO SE O CAMPO RASTRO ESTIVER VAZIO)
                         QTD_MOVIM + " FLOAT NOT NULL, " +
                         ARMZ_DEST + " VARCHAR(2) NOT NULL, " +
+                        DATAHORA + " VARCHAR(13) NOT NULL, " +
                         USERNAME + " VARCHAR(64) NOT NULL, " +
                         STATUS_SYNC + " INT " +
                         ");")
 
-    }
+        val createTBLNOTIF = (
+                "CREATE TABLE "+ TBL_NOTIF +" (" +
+                        ID_NOTIF +" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
+                        MENSG +" VARCHAR(255) NOT NULL, " +
+                        DATAHORA +" VARCHAR(13) NOT NULL, " +
+                        DADOS_LCM + " VARCHAR(255) NOT NULL, " +
+                        USERNAME + " VARCHAR(64)," +
+                        LIDO + " VARCHAR(64)" +
+                        ");")
 
+    }
 
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -138,6 +157,8 @@ class SQLiteHelper(context: Context?):
         db?.execSQL(createTBLSALDO)
         db?.execSQL(createTBLSL)
         db?.execSQL(createTBLMOVIM)
+        db?.execSQL(createTBLNOTIF)
+        //db?.execSQL("INSERT INTO $TBL_NOTIF ($MENSG, $DADOS_LCM, $USERNAME) VALUES ('kane','123'), ('gilberto','12345', 'Gilberto Gonçalves'), ('zack', 'zsjl', 'Zachary Snyder');")
         //db?.execSQL("INSERT INTO Usuario (username, password) VALUES ('kane','123'), ('gilberto','12345', 'Gilberto Gonçalves'), ('zack', 'zsjl', 'Zachary Snyder');")
         //db?.execSQL("INSERT INTO produto (descProduto, qeProduto, validProduto, tipoVProduto) VALUES ('Selecione o item','', '', '');")
         //db?.execSQL("INSERT INTO produto (descProduto, qeProduto, validProduto, tipoVProduto) VALUES ('Pão 5 15 D','5', '15', 'D'), ('Pão 13 3 M','13', '3', 'M'), ('Pão 1 13 S', '1', '13', 'S');")
@@ -359,6 +380,7 @@ class SQLiteHelper(context: Context?):
                 LOTE,
                 QTD_MOVIM,
                 ARMZ_DEST,
+                DATAHORA,
                 USERNAME,
                 STATUS_SYNC
             ),
@@ -373,58 +395,28 @@ class SQLiteHelper(context: Context?):
         }
         return cursor
     }
-    /*fun getInternalMovimento(): Cursor? {
-        val selectQuery =
-            "SELECT $ID_MOVIM, " +
-                    "$ARMZ_ORIG, " +
-                    "$COD_PROD, " +
-                    "$LOTE," +
-                    "$QTD_MOVIM, " +
-                    "$ARMZ_DEST, " +
-                    "$USERNAME," +
-                    "$STATUS_SYNC  " +
-                    "FROM $TBL_MOVIM WHERES $STATUS_SYNC = 0;"
-        val result = db.rawQuery(selectQuery, null)
-        return result
-    }*/
-
-
-    /*fun getDescMotivo(idMtv: Int): Cursor? {
+    fun getInternalNotificacao(username: String): Cursor? {
         var cursor = db.query(
-            TBL_MOTIVO,
-            arrayOf("$ID_MOTIVO AS ${BaseColumns._ID}",
-                DESC_MOTIVO
+            TBL_NOTIF,
+            arrayOf(
+                "$ID_NOTIF AS ${BaseColumns._ID}",
+                MENSG,
+                DATAHORA,
+                DADOS_LCM,
+                USERNAME,
+                LIDO
             ),
-            "idMotivo = $idMtv" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            "$LIDO = 'N' AND $USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
             null /* GROUP BY clause, null if no GROUP BY clause */,
             null /* HAVING CLAUSE, null if no HAVING clause */,
-            null /* ORDER BY clause products will be shown alphabetically a->z*/
+            ID_NOTIF + " DESC" //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
         )
-
         if (cursor == null || !cursor.moveToFirst()) {
             return null
         }
         return cursor
-
     }
-
-
-
-    fun getAP(): Cursor? {
-        val selectQuery =
-            "SELECT $ID_AP, " +
-                    "$QTD_AP, " +
-                    "$UN_AP, " +
-                    "$DATA_AP, " +
-                    "$USERNAME, " +
-                    "$ID_PRODUTO, " +
-                    "$ID_MOTIVO, " +
-                    "$STATUS_SYNC_AP " +
-                    "FROM $TBL_APONTPERDA WHERE $STATUS_SYNC_AP = 0;"
-        val result = db.rawQuery(selectQuery, null)
-        return result
-    }*/
 
     fun insertDone(id: Int?) {
         var query: String
@@ -435,6 +427,7 @@ class SQLiteHelper(context: Context?):
             db.execSQL(query)
         }
     }
+
 
     /*fun getMotivo(): Cursor {
         return db.query(
@@ -450,5 +443,6 @@ class SQLiteHelper(context: Context?):
         )
     }*/
 }
+
 
 

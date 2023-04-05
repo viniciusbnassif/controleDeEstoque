@@ -46,14 +46,29 @@
                 android:background="@color/colorPrimary"
                 app:navigationIconTint="@color/white"
                 app:title="Menu Principal"
-                app:titleTextColor="@color/white" />
+                app:menu="@menu/main_menu"
+                app:titleTextColor="@color/white">
+
+                <!--ImageButton
+                    android:id="@+id/notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_margin="5dp"
+                    android:layout_marginRight="0dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:src="@drawable/ic_baseline_notifications_24"
+                    android:title="Notificações" /-->
+            </com.google.android.material.appbar.MaterialToolbar>
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progressToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
+
                 android:visibility="invisible" />
+
 
         </com.google.android.material.appbar.AppBarLayout>
 

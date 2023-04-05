@@ -12,11 +12,15 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.AlarmClock
 import android.provider.Settings
+import android.text.LoginFilter.UsernameFilterGMail
 import android.util.AttributeSet
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -31,9 +35,12 @@ import kotlinx.coroutines.*
 
 
 class MainMenu : AppCompatActivity(), LifecycleEventObserver {
+    lateinit var user: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_menu)
+
+
 
 
 
@@ -277,7 +284,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
 
         val username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE)
-        var saudacao = "Bem-vindo, ${username}"
+        var saudacao = "Bem-vindo, ${username}" // 11
         findViewById<TextView>(R.id.saudacao).apply { text = saudacao }
 
         var intent: Intent
@@ -300,28 +307,35 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                     putExtra(AlarmClock.EXTRA_MESSAGE, username)}
             startActivity(intent)*/
         }
+
+
     }
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
     }
 
+    var versionCode = BuildConfig.VERSION_CODE
+    var versionName = BuildConfig.VERSION_NAME
 
 
 
-
-
-    //var btnSync = findViewById<MaterialButton>(R.id.syncBtn)
-
-    /*@SuppressLint("ResourceAsColor")
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
 
-        R.id.syncBtn -> {
-            // User chose the "Settings" item, show the app settings UI...
 
-            //btnSync.setBackgroundColor(R.color.black)
-            sync.sync(0, this)
-            //btnSync.setBackgroundColor(R.color.blue_700)
+
+        R.id.notification -> {
+
+            var username = findViewById<TextView>(R.id.saudacao).text.substring(11)
+
+            var notif = Intent(this, Notificacoes::class.java)
+                .apply {
+                    putExtra(AlarmClock.EXTRA_MESSAGE, username)
+                }
+            startActivity(notif)
+
             true
+
         }
 
         else -> {
@@ -329,8 +343,14 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
-    }*/
 
+
+
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+    }
 
     /* When the activity is destroyed then close the cursor as it will not be used again */
     override fun onBackPressed() {

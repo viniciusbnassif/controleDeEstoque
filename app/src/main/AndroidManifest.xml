@@ -8,6 +8,8 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -15,10 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ControleDeEstoque"
-        android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".Notificacoes"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".TransferenciaDeArmazem"
+            android:configChanges="orientation"
             android:exported="false"
             android:windowSoftInputMode="adjustResize">
             <meta-data
@@ -34,10 +43,10 @@
         </activity>
         <activity
             android:name=".MainMenu"
-            android:exported="false"
-            >
+            android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
+                android:configChanges="orientation|keyboardHidden|screenSize"
                 android:value="" />
         </activity>
         <activity
@@ -54,6 +63,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
     </application>
 
 </manifest>
