@@ -28,6 +28,8 @@ import com.kingdom.controledeestoque.SQLiteHelper
 import com.kingdom.controledeestoque.database.LoadContent
 import com.kingdom.controledeestoque.database.Sync
 import com.kingdom.controledeestoque.database.confirmUnPw
+import java.lang.Integer.parseInt
+import java.util.*
 import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
@@ -241,6 +243,20 @@ class MainActivity : AppCompatActivity() {
             MainScope().launch { authUser(context) }
 
         }
+        var dateTime = "05/04/2023"
+        var dty = dateTime.split("/").toTypedArray()
+        var minute = "05:50"
+        var dmi = minute.split(":").toTypedArray()
+
+        var calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_MONTH, parseInt(dty[0]))
+        calendar.set(Calendar.MONTH, parseInt(dty[1]))
+        calendar.set(Calendar.YEAR, parseInt(dty[2]))
+        calendar.set(Calendar.HOUR_OF_DAY, parseInt(dmi[0]))
+        calendar.set(Calendar.MINUTE, parseInt(dmi[1]))
+
+        var date = "01/01/2023"//.toLong()
+        NotificationManager(this).NotificacaoErro( "produto", "Guilherme é um cagão","MensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhada", calendar.getTimeInMillis())
     }
 
 

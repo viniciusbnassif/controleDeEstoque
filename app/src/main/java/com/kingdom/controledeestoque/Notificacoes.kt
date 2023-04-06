@@ -55,8 +55,10 @@ class Notificacoes : AppCompatActivity() {
                     Sync().sync(2, ctxt)
                 } catch (e: Exception){}
                 MainScope().run {
-                    finish()
+
                     startActivity(getIntent())
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                    finish()
                 }
             }
         }
@@ -110,4 +112,3 @@ class Notificacoes : AppCompatActivity() {
     }
 
 }
-

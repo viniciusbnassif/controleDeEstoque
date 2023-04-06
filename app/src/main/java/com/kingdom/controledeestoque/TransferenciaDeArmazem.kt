@@ -187,10 +187,9 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var cursorArray = ArrayList<Any>()
             if (cursorArmzOrig != null) {
                 cursorArmzOrig.moveToFirst()
-                cursorArray.add(cursorArmzOrig.getString(1))
+                cursorArray.add("${cursorArmzOrig.getString(1)} -  ${cursorArmzOrig.getString(2)}")
                 while (cursorArmzOrig.moveToNext()) {
                     cursorArray.add(
-                        cursorArmzOrig.getInt(0),
                         cursorArmzOrig.getString(1) + " - " + cursorArmzOrig.getString(2)
                     )
                 }
@@ -309,7 +308,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         setOrRefreshSpnPrd()
         setOrRefreshSpnArmzDest()
 
-        fun salvar(): AlertDialog? {
+        fun salvar(cod: Int): AlertDialog? {
             var query = ""
             var message = ""
             var rastro = db.getRastro(spinnerCodPrd?.text.toString())
@@ -383,6 +382,14 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 } catch (e: Exception){}
                 cancel()
             }
+            if (cod == 1){
+                startActivity(getIntent())
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+                finish()
+            } else if (cod == 0){
+                finish()
+                return null
+            }
             return null
 
         }
@@ -390,12 +397,11 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
         var finalizarBtn = findViewById<Button>(R.id.finalizar)
         finalizarBtn.setOnClickListener {
-            salvar()
-            finish()
+            salvar(0)
         }
-        var salvarBtn = findViewById<Button>(R.id.finalizar)
+        var salvarBtn = findViewById<Button>(R.id.salvar)
         salvarBtn.setOnClickListener {
-            salvar()
+            salvar(1)
             //limpar campos aqui
         }
     }
