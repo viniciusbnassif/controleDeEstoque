@@ -4,10 +4,12 @@ import android.app.Application
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.os.StrictMode
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.lifecycle.*
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.api.Context
 import com.kingdom.controledeestoque.MainActivity
 import com.kingdom.controledeestoque.SQLiteHelper
@@ -18,23 +20,20 @@ import kotlin.concurrent.thread
 import kotlin.coroutines.coroutineContext
 
 
-class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
+class Sync : AppCompatActivity(), LifecycleEventObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
     }
 
-    suspend fun testConnection(): String {
+    suspend fun testConnection(): String? {
 
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
 
-        var rtn: String
-
-        rtn = CoroutineScope(Dispatchers.IO).async(CoroutineName("testConnectionSync")) {
+        //rtn = CoroutineScope(Dispatchers.IO).async(CoroutineName("testConnectionSync")) {
+        return withContext(Dispatchers.IO){
             var message: String
             val host = "192.168.1.11"
             val port = 8080
@@ -53,23 +52,24 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
                     // host and port combination not valid
                     message = "Falha"
                     e.printStackTrace()
-                    return@async message
+                    return@withContext message
                 } catch (e: Exception) { //sem conexão
                     message = "Sem Conexão"
                     e.printStackTrace()
-                    return@async message
+                    return@withContext message
                 }
                 message = "Sucesso"
-                return@async message
-            }catch (e: Exception){}
+                return@withContext message
+            }catch (e: Exception){
+                return@withContext e.toString()
+            }
 
-        }.await().toString()
+        } as? String?
         //while (CoroutineScope(Dispatchers.IO).isActive = )
-        return rtn
     }
 
 
-    suspend fun sync(cod: Int, ctxt: android.content.Context): String {
+    suspend fun sync(cod: Int, ctxt: android.content.Context): String? {
 
         /*0 zero Sincroniza tudo
         1 sincroniza apenas os inserts ao servidor
@@ -77,46 +77,55 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
         || = xor (ou lógico)
         && = e
          */
-        //var msg = lifecycleScope.async(Dispatchers.Default) {
-            var message: String
+        var message: String
 
-            var result = testConnection()
+        var result = testConnection()
 
-            if (result == "Sucesso") {
-                if (cod == 0 || cod == 1) {
+        if (result == "Sucesso") {
+            return withContext(Dispatchers.IO) {
+                try {
+                    if (cod == 0 || cod == 1 || cod == 2) {
 
-                    movimentoToServer(ctxt)
-                    //queryExternalServerAE(ctxt)
-                    //queryExternalServerAP(ctxt)
-                    if (cod == 1) {
-                        message = "Sucesso" //Sincronizado com sucesso
-                        return message
+                        getNotificacao(ctxt)
+                        //queryExternalServerAE(ctxt)
+                        //queryExternalServerAP(ctxt)
+                        if (cod == 2) {
+                            message = "Sucesso" //Sincronizado com sucesso
+                            return@withContext message
+                        }
                     }
-                }
-                if (cod == 0 || cod == 1 || cod == 2) {
+                    if (cod == 0 || cod == 1) {
 
-                    getNotificacao(ctxt)
-                    //queryExternalServerAE(ctxt)
-                    //queryExternalServerAP(ctxt)
-                    if (cod == 1) {
-                        message = "Sucesso" //Sincronizado com sucesso
-                        return message
+                        movimentoToServer(ctxt)
+                        //queryExternalServerAE(ctxt)
+                        //queryExternalServerAP(ctxt)
+                        if (cod == 1) {
+                            message = "Sucesso" //Sincronizado com sucesso
+                            return@withContext message
+                        }
                     }
-                }
-                if (cod == 0) {
+                    if (cod == 0) {
 
-                    getProdutoExt(ctxt)
-                    getArmz(ctxt)
-                    getSaldo(ctxt)
-                    getSlLote(ctxt)
+                        getProdutoExt(ctxt)
+                        getArmz(ctxt)
+                        getSaldo(ctxt)
+                        getSlLote(ctxt)
 
-                    message = "Sucesso" //Sincronizado com sucesso
-                    return message
+                        message = "Sucesso" //Sincronizado com sucesso
+                        return@withContext message
+                    } else {
+
+                    }
+                } catch (e: Exception){
+                    Log.d("Sync Exception Error", e.toString())
+                    return@withContext e
                 }
-            }
-            message = "Falha"
+
+            } as String
+        }
+        message = "Falha"
         //}.await() as String
-        return message
+        return result
 
     }
 
@@ -148,6 +157,10 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
         }
 
     }
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+
+    }
     /*@OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun appInResumeState() {
         Toast.makeText(this,"In Foreground", Toast.LENGTH_LONG).show();
@@ -170,15 +183,15 @@ class Sync : AppCompatActivity()/*, LifecycleEventObserver*/ {
 }
 
 
-class LoadContent: AppCompatActivity(){
+/*class LoadContent: AppCompatActivity(){
     suspend fun loadContent(ctxt: android.content.Context): String{
 
 
         var message : String = CoroutineScope(Dispatchers.Unconfined).run {
-            Sync().sync(0, ctxt)
+            var str = Sync().sync(0, ctxt)
         }
 
 
         return message
     }
-}
+}*/

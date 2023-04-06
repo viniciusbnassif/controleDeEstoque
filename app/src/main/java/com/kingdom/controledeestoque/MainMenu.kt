@@ -44,7 +44,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
 
 
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        //ProcessLifecycleOwner.get().lifecycle.addObserver(this)
 
         window.decorView.apply {
             // Hide both the navigation bar and the status bar.
@@ -86,6 +86,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
             if (result == "true") {
                 progressTB.setVisibility(View.VISIBLE)
                 syncBtn.setEnabled(false)
+                toolbar.isEnabled = false
                 syncBtn.setText("Sincronizando")
                 buttonTrArmz.setEnabled(false)
                 buttonTrArmz.text = "Aguarde a sincronização ser concluída"
@@ -93,11 +94,13 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
                 syncBtn.setText("Sincronizar")
+                toolbar.isEnabled = true
                 buttonTrArmz.setEnabled(true)
                 buttonTrArmz.setText("Transferência de armazem")
             } else if (result == "syncFail") {
                 progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
+                toolbar.isEnabled = false
                 syncBtn.setText("Falha ao sincronizar")
                 buttonTrArmz.setEnabled(false)
                 buttonTrArmz.setText("Falha ao sincronizar")
@@ -130,34 +133,55 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
 
 
-        fun postConnectionView(result: String) {
-            MainScope().launch(CoroutineName("MainMenu")) {
+        suspend fun postConnectionView(result: String) {
+            var ctxt = this
+
+            return withContext(Dispatchers.Main) {
                 try {
-                    if (result == "Falha" || result == "") {
-                        val snackbar = Snackbar.make(
-                            findViewById(R.id.CL),
-                            "Não foi possível estabelecer uma conexão com o servidor",
-                            Snackbar.LENGTH_INDEFINITE
-                        ).setBackgroundTint(Color.parseColor("#741919")).setTextColor(Color.WHITE)
-                            .setActionTextColor(
-                                Color.WHITE
-                            ).setAction("OK") {}.show()
-                    } else if (result == "Sem Conexão") {
-                        showProgress("false")
-                        Snackbar.make(
-                            findViewById(R.id.CL),
-                            "Não foi possível estabelecer uma conexão com o servidor (Endereço e porta indisponíveis para esta rede)",
-                            Snackbar.LENGTH_LONG
-                        ).setBackgroundTint(Color.parseColor("#E3B30C")).setTextColor(Color.WHITE)
-                            .setActionTextColor(
-                                Color.WHITE
-                            ).setAction("OK") {}.show()
+                    if (result == "Falha") {
+                        /*val snackbar = Snackbar.make(
+                        findViewById(R.id.CL),
+                        "Não foi possível estabelecer uma conexão com o servidor",
+                        Snackbar.LENGTH_INDEFINITE
+                    ).setBackgroundTint(Color.parseColor("#741919")).setTextColor(Color.WHITE)
+                        .setActionTextColor(
+                            Color.WHITE
+                        ).setAction("OK") {}.show()*/
+                        MaterialAlertDialogBuilder(ctxt)
+                            .setTitle("Erro ao conectar")
+                            .setMessage("Não foi possivel estabelecer uma conexão com o servidor. Tente novamente.")
+                            .setNegativeButton("Fechar") { dialog, which ->
+                                dialog.dismiss()
+                            }
+                    } else if (result == "Sem Conexão" || result == "") {
+                        MaterialAlertDialogBuilder(ctxt)
+                            .setTitle("Erro ao conectar")
+                            .setMessage(
+                                "Não foi possível estabelecer uma conexão com o servidor. \n\nEndereço e porta indisponíveis para esta rede\n" +
+                                        "Isso geralmente acontece quando o tablet está conectado a uma rede incorreta."
+                            )
+                            .setNegativeButton("Fechar") { dialog, which ->
+                                dialog.dismiss()
+                            }
+                            .setNeutralButton("Abrir Configurações Wi-fi") { dialog, which ->
+                                dialog.dismiss()
+                            }
+                        /*showProgress("false")
+                    Snackbar.make(
+                        findViewById(R.id.CL),
+                        "Não foi possível estabelecer uma conexão com o servidor (Endereço e porta indisponíveis para esta rede)",
+                        Snackbar.LENGTH_LONG
+                    ).setBackgroundTint(Color.parseColor("#E3B30C")).setTextColor(Color.WHITE)
+                        .setActionTextColor(
+                            Color.WHITE
+                        ).setAction("OK") {}.show()*/
                     } else if (result == "Sucesso") {
                         Snackbar.make(
                             findViewById(R.id.CL),
                             "Sincronizado com sucesso!",
                             Snackbar.LENGTH_SHORT
-                        ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
+                        ).setBackgroundTint(Color.parseColor("#197419"))
+                            .setTextColor(Color.WHITE)
                             .setActionTextColor(
                                 Color.WHITE
                             ).setAction("OK") {}.show()
@@ -171,29 +195,18 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
 
         suspend fun connectionView() {
-            var result = ""
+            var result: String
 
             //CoroutineScope(Dispatchers.IO).async(CoroutineName("testConnectionMM")) {
-            CoroutineScope(CoroutineName("testConnectionMM")).async(Dispatchers.Unconfined) {
-                try {
-                    if (Looper.myLooper() == null) {
-                        Looper.prepare()
-                    }
-                    result = Sync().testConnection()
+                var rs = ""
+                    rs = Sync().testConnection().toString()
 
-                    Log.d("ConnectionView result", result)
-                    postConnectionView(result)
 
-                } catch (e: Exception) {
-                    Log.d("connectionView", e.toString())
-                }
+            postConnectionView(rs)
+            Log.d("ConnectionView result2", rs)
+            //return result
+            postConnectionView(rs)
 
-                Log.d("ConnectionView result2", result)
-                //return result
-                MainScope().launch {
-                    postConnectionView(result)
-                }
-            }
 
             //Log.d("ConnectionView rtn", rtn)
 
@@ -203,7 +216,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
         }
 
-        CoroutineScope(Dispatchers.Unconfined).launch {
+        CoroutineScope(Dispatchers.IO).async {
             connectionView()
         }
 
@@ -245,36 +258,67 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
             }.await()
 
 
-            //var global = LifecycleEventObserver()
-            CoroutineScope(CoroutineName("SyncMainMenu")).async(Dispatchers.Unconfined) { // <------------------------------------------------
-
+            var rtn: String = withContext(Dispatchers.IO) {
                 var msgrtn = ""
                 try {
                     if (Looper.myLooper() == null) {
                         Looper.prepare()
                     }
-                    var thisHandler = Handler()
-                    msgrtn = Sync().sync(0, ctxt)
+                    msgrtn = Sync().sync(0, ctxt).toString()
+                    return@withContext msgrtn
                 } catch (e: Exception) {
                     Log.d("MainMenu", e.toString())
-                    MainScope().async {
-                        showProgress("syncFail")
-                    }
-
+                    return@withContext e.toString()
                 }
-                if (msgrtn == "Sucesso") {
-                    MainScope().run { postSyncSuccess() }
-
-                } else if (msgrtn == "Falha") {
-                    connectionView()
-                    cancel()
-                }
-                //cancel()
+                return@withContext msgrtn
             }
+            if (rtn == "Sucesso") {
+                //postSyncSuccess()
+                Snackbar.make(
+                    cl,
+                    "Sincronizado com sucesso!",
+                    Snackbar.LENGTH_INDEFINITE
+                ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
+                    .setActionTextColor(
+                        Color.WHITE
+                    ).setAction("OK") {}.show()
+                showProgress("false")
+                Log.d("run?", "Success (?)")
+
+            } else if (rtn == "Falha") {
+                connectionView()
+            }
+
+            //CoroutineScope(CoroutineName("SyncMainMenu")).//async(Dispatchers.IO) { // <------------------------------------------------
+            var msgr = withContext(Dispatchers.IO) {
+                var msgrtn: String
+                try {
+                    if (Looper.myLooper() == null) {
+                        Looper.prepare()
+                    }
+                    msgrtn = Sync().sync(0, ctxt).toString()
+                    return@withContext msgrtn
+                } catch (e: Exception) {
+                    Log.d("MainMenu", e.toString())
+                    var error = e.toString().substringBefore(":")
+                    if (error == "java.lang.IllegalStateException")
+                        withContext(Dispatchers.Main) {
+                            postConnectionView("Falha")
+                        } else TODO()
+
+                }
+            }as String
+            if (msgr == "Sucesso") {
+                postSyncSuccess()
+
+            } else if (msgr == "Falha") {
+                connectionView()
+            }
+                //cancel()
         }
 
         syncBtn.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Unconfined) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     synchronization()
                 } catch (e: Exception) {

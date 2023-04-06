@@ -21,11 +21,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet.Constraint
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.kingdom.controledeestoque.SQLiteHelper
-import com.kingdom.controledeestoque.database.LoadContent
 import com.kingdom.controledeestoque.database.Sync
 import com.kingdom.controledeestoque.database.confirmUnPw
 import java.lang.Integer.parseInt
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
+        var ctxt = this
 
 
         window.decorView.apply {
@@ -47,19 +48,6 @@ class MainActivity : AppCompatActivity() {
             systemUiVisibility =
                 View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
-
-
-
-
-        /*val toolbar = findViewById<Toolbar?>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.apply {
-            // show back button on toolbar
-            // on back button press, it will navigate to parent activity
-            setDisplayHomeAsUpEnabled(false)
-            setDisplayShowCustomEnabled(false)
-        }*/
-
 
 
 
@@ -139,6 +127,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        suspend fun runSync(): String {
+            //CoroutineScope(CoroutineName("SyncMainActivity")).async(Dispatchers.Unconfined) {
+            return withContext(Dispatchers.IO) {
+                var rtn: String
+                try {
+                    if (Looper.myLooper() == null) {
+                        Looper.prepare()
+                    }
+                    rtn = sync.sync(0, ctxt).toString()
+                    return@withContext rtn
+                } catch (e: Exception) {
+                    Log.d("SyncMainActivity (Thread)", e.toString())
+                }
+                //syncIsDone()
+            } as String
+        }
+
         suspend fun authUser(ctxt: android.content.Context) {
             showProgress("true")
 
@@ -181,23 +186,21 @@ class MainActivity : AppCompatActivity() {
                     //var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
                     //progress.visibility = VISIBLE
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    CoroutineScope(CoroutineName("SyncMainActivity")).async(Dispatchers.Unconfined) {
-                        try {
-                            if (Looper.myLooper() == null) {
-                                Looper.prepare()
-                            }
-                    /*CoroutineScope(Dispatchers.IO).launch(CoroutineName("SyncMainActivity")) {
-                        try {
-                            Looper.prepare()
-                            Looper.myLooper()*/
-                            sync.sync(0, ctxt)
-                            Looper.myLooper()?.quit()
-                        } catch (e: Exception){
-                            Log.d("SyncMainActivity (Thread)", e.toString())
+
+
+                    var message = runSync()
+                    if (message == "Sucesso"){
+                        var mainMenu = Intent(this, MainMenu::class.java).apply {
+                            putExtra(AlarmClock.EXTRA_MESSAGE, user.text.toString())
                         }
-                        syncIsDone()
-                        cancel()
+                        startActivity(mainMenu)
+
+                        finish()
+                    } else {
+                        showProgress("false")
                     }
+
+
 
 
                 } else if (validation == 401) {
@@ -225,13 +228,23 @@ class MainActivity : AppCompatActivity() {
                     startActivity(mainMenu)
                     finish()
                 } else if (auth == false) {
-                    Snackbar.make(
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Não foi possivel sincronizar")
+                        .setMessage("Não foi possivel conectar ao servidor. \nVerifique as configurações de rede e tente novamente.")
+                        .setNegativeButton(
+                            "Fechar") { dialog, which ->
+                            dialog.dismiss()
+                        }
+                        .setNeutralButton("Abrir Configurações de Wi-fi") { dialog, which ->
+                            startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+                        }.show()
+                    /*Snackbar.make(
                         elementsOnLogin,
                         "Não foi possivel conectar ao servidor. Verifique as configurações de rede e tente novamente.",
                         Snackbar.LENGTH_LONG
                     ).setAction("Abrir Configurações") {
                         startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-                    }.show()
+                    }.show()*/
                     showProgress("false")
                 }
             }

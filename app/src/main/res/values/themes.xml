@@ -13,6 +13,10 @@
         <item name="colorPrimaryContainer">@color/color_0</item>
         <item name="colorSecondaryContainer">@color/colorPrimary</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
+
+        <item name="android:textColorHighlight">@color/colorSecondary</item>
+
+
         <!-- Status bar color. -->
         <!--item name="android:statusBarColor">@color/blue_0</item-->
         <item name="android:navigationBarColor">@color/colorPrimary</item>
