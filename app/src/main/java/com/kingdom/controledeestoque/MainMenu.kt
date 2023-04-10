@@ -34,7 +34,7 @@ import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.*
 
 
-class MainMenu : AppCompatActivity(), LifecycleEventObserver {
+class MainMenu : AppCompatActivity()/*, LifecycleEventObserver*/ {
     lateinit var user: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -233,7 +233,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 .setActionTextColor(
                     Color.WHITE
                 ).setAction("OK") {}.show()
-            MainScope().async {
+            MainScope().launch {
                 try {
                     showProgress("false")
                     Log.d("run?", "run?")
@@ -257,15 +257,72 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 }
             }.await()
 
+            CoroutineScope(Dispatchers.Unconfined).launch {
+                try {
+                    if (Looper.myLooper() == null) {
+                        Looper.prepare()
+                    }
+                    val r = Sync().sync(0, ctxt).toString()
 
-            var rtn: String = withContext(Dispatchers.IO) {
+                    if (r == "Sucesso"){
+                        MainScope().launch {
+                            try {
+                                showProgress("false")
+                                Log.d("run?", "run?")
+                            } catch (e: Exception) {
+                                Log.d("run e?", e.toString())
+                            }
+                        }
+                    } else if (r == "Falha"){
+                        MainScope().launch {
+                            try {
+                                showProgress("syncFail")
+                                Log.d("run?", "run?")
+                            } catch (e: Exception) {
+                                Log.d("run e?", e.toString())
+                            }
+                        }
+                    } else {
+
+                    }
+                } catch (e: Exception) {
+                    Log.d("SyncMainActivity (Thread)", e.toString())
+                    //return@launch "Falha"
+                }
+
+                //syncIsDone()
+            }
+
+            /*if (rtn == "Sucesso"){
+                MainScope().async {
+                    try {
+                        showProgress("false")
+                        Log.d("run?", "run?")
+                    } catch (e: Exception) {
+                        Log.d("run e?", e.toString())
+                    }
+                }.await()
+            } else if(rtn == "Falha"){
+                MainScope().async {
+                    try {
+                        showProgress("syncFail")
+                        Log.d("run?", "run?")
+                    } catch (e: Exception) {
+                        Log.d("run e?", e.toString())
+                    }
+                }.await()
+            }*/
+
+
+
+            /*var rtn: String = withContext(Dispatchers.IO) {
                 var msgrtn = ""
                 try {
                     if (Looper.myLooper() == null) {
                         Looper.prepare()
                     }
-                    msgrtn = Sync().sync(0, ctxt).toString()
-                    return@withContext msgrtn
+                    //msgrtn =
+                    return@withContext Sync().sync(0, ctxt).toString()
                 } catch (e: Exception) {
                     Log.d("MainMenu", e.toString())
                     return@withContext e.toString()
@@ -302,7 +359,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                     Log.d("MainMenu", e.toString())
                     var error = e.toString().substringBefore(":")
                     if (error == "java.lang.IllegalStateException")
-                        withContext(Dispatchers.Main) {
+                        MainScope().launch {
                             postConnectionView("Falha")
                         } else TODO()
 
@@ -313,17 +370,19 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
             } else if (msgr == "Falha") {
                 connectionView()
-            }
+            }*/
                 //cancel()
         }
 
         syncBtn.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    synchronization()
-                } catch (e: Exception) {
-                }
+            MainScope().launch {
+                synchronization()
+                /*if (rtn == "Sucesso"){
+                    postSyncSuccess()
+                }*/
             }
+
+
         }
 
 
@@ -426,7 +485,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
 
 
 
-    val lifecycleEventObserver = LifecycleEventObserver { source, event ->
+    /*val lifecycleEventObserver = LifecycleEventObserver { source, event ->
         if (event == Lifecycle.Event.ON_RESUME ) {
             Log.e( "APP" , "resumed" )
         }
@@ -455,7 +514,7 @@ class MainMenu : AppCompatActivity(), LifecycleEventObserver {
                 }
             }
         }
-    }
+    }*/
 
 }
 

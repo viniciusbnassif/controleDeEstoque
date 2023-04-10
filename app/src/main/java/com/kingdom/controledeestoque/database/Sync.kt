@@ -69,7 +69,7 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
     }
 
 
-    suspend fun sync(cod: Int, ctxt: android.content.Context): String? {
+    suspend fun sync(cod: Int, ctxt: android.content.Context): String {
 
         /*0 zero Sincroniza tudo
         1 sincroniza apenas os inserts ao servidor
@@ -125,7 +125,7 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
         }
         message = "Falha"
         //}.await() as String
-        return result
+        return message
 
     }
 
