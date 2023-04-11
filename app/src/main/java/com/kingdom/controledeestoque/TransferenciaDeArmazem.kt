@@ -1,13 +1,10 @@
 package com.kingdom.controledeestoque
 
-import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.AlarmClock
-import android.provider.Settings
-import android.text.TextUtils.substring
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -20,12 +17,9 @@ import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.kingdom.controledeestoque.SQLiteHelper
-import com.kingdom.controledeestoque.database.Connection
 import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.*
 import java.lang.Float.parseFloat
-import java.lang.Integer.parseInt
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -169,6 +163,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                     spinnerCodLote.text = spnLote.text.substring(0,10)
                     saldoLote.text = spnLote.text.substring(20)
                     saldoProduto()
+                    spnLote.clearFocus()
                 }
             spnLote.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus == false){
@@ -187,7 +182,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var cursorArray = ArrayList<Any>()
             if (cursorArmzOrig != null) {
                 cursorArmzOrig.moveToFirst()
-                cursorArray.add("${cursorArmzOrig.getString(1)} -  ${cursorArmzOrig.getString(2)}")
+                cursorArray.add("${cursorArmzOrig.getString(1)} - ${cursorArmzOrig.getString(2)}")
                 while (cursorArmzOrig.moveToNext()) {
                     cursorArray.add(
                         cursorArmzOrig.getString(1) + " - " + cursorArmzOrig.getString(2)
@@ -206,6 +201,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                         setOrRefreshSpnLote()
                         Log.d("setOrRefreshSpnLote", "run? 1")
                     }
+                    spnArmzOrig.clearFocus()
                     saldoProduto()
                 }
             spnArmzOrig.setOnFocusChangeListener { v, hasFocus ->
@@ -251,6 +247,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                             Log.d("setOrRefreshSpnLote", "run? 1")
                         //}
                     }
+                    spnPrd.clearFocus()
                 }
             spnPrd.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus == false){
@@ -269,7 +266,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var cursorArray = ArrayList<Any>()
             if (cursorArmzDest != null) {
                 cursorArmzDest.moveToFirst()
-                cursorArray.add(cursorArmzDest.getString(1))
+                cursorArray.add(cursorArmzDest.getString(1) + " - " + cursorArmzDest.getString(2))
                 while (cursorArmzDest.moveToNext()) {
                     cursorArray.add(
                         cursorArmzDest.getInt(0),
@@ -290,8 +287,8 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                             Log.d("setOrRefreshSpnLote", "run? 1")
                         }
                         saldoProduto()
-
                     }
+                    spnArmzDest.clearFocus()
                 }
             spnArmzDest.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus == false){
@@ -331,22 +328,23 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 message += "\n- Lote; "
             }
 
-            if (movimento.text?.isEmpty()!!){
+            if (movimento.text?.isEmpty() == true){
                 message += "\n- Quantidade a movimentar; "
             } else {
-
-                var movimentoresult = parseFloat(movimento.text.toString())
-                var saldoLoteResult = parseFloat(saldoLote.text.toString())
-                if (movimentoresult > saldoLoteResult){
-                    movimento.setText("")
-                    var showMessage = MaterialAlertDialogBuilder(this)
-                        .setTitle("Você está tentando movimentar uma quantidade maior que existe no lote.")
-                        .setMessage("Verifique o valor de saldo no campo lote.")
-                        .setPositiveButton("Fechar") { dialog, which ->
-                            dialog.dismiss()
-                        }
-                        .setCancelable(false)
-                    return showMessage.show()
+                if (spinnerCodLote.text.isEmpty() == false){
+                    var movimentoresult = parseFloat(movimento.text.toString())
+                    var saldoLoteResult = parseFloat(saldoLote.text.toString())
+                    if (movimentoresult > saldoLoteResult){
+                        movimento.setText("")
+                        var showMessage = MaterialAlertDialogBuilder(this)
+                            .setTitle("Você está tentando movimentar uma quantidade maior que existe no lote.")
+                            .setMessage("Verifique o valor de saldo no campo lote.")
+                            .setPositiveButton("Fechar") { dialog, which ->
+                                dialog.dismiss()
+                            }
+                            .setCancelable(false)
+                        return showMessage.show()
+                    }
                 }
             }
             if (spnArmzDest.text.isEmpty()){
@@ -355,7 +353,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var showMessage = MaterialAlertDialogBuilder(this)
                 .setIcon(R.drawable.ic_baseline_deselect_24_black)
                 .setTitle("Existem campos não preenchidos.")
-                .setMessage("\bVerifique os campos a seguir: \n$message")
+                .setMessage("Verifique os campos a seguir: \n$message")
                 .setPositiveButton("Fechar") { dialog, which ->
                     dialog.dismiss()
                 }

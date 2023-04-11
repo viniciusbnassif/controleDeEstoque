@@ -1,23 +1,12 @@
 package com.kingdom.controledeestoque.database
 
-import android.app.Application
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.os.StrictMode
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.api.Context
-import com.kingdom.controledeestoque.MainActivity
-import com.kingdom.controledeestoque.SQLiteHelper
 import kotlinx.coroutines.*
-import okhttp3.OkHttpClient
 import java.net.*
-import kotlin.concurrent.thread
-import kotlin.coroutines.coroutineContext
 
 
 class Sync : AppCompatActivity(), LifecycleEventObserver {

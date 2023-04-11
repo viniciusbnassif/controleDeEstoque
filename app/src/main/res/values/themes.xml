@@ -26,4 +26,11 @@
         <!-- Customize your theme here. -->
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+    <item name="colorPrimary">?attr/colorPrimary</item>
+    <item name="colorSecondary">?attr/colorSecondary</item>
+    <item name="colorSurface">?attr/colorSurface</item>
+    <item name="colorOnSurface">?attr/colorOnSurface</item>
+    </style>
 </resources>

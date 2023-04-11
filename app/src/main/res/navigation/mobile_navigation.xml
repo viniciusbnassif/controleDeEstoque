@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/mainMenu"
+        android:name="com.kingdom.controledeestoque.MainMenu"
+        android:label="activity_main_menu"
+        tools:layout="@layout/activity_main_menu" >
+        <action
+            android:id="@+id/action_mainMenu_to_relatorio2"
+            app:destination="@id/relatorio" />
+        <action
+            android:id="@+id/action_mainMenu_to_notificacoes2"
+            app:destination="@id/notificacoes" />
+    </fragment>
+    <fragment
+        android:id="@+id/relatorio"
+        android:name="com.kingdom.controledeestoque.Relatorio"
+        android:label="activity_relatorio"
+        tools:layout="@layout/activity_relatorio" />
+    <fragment
+        android:id="@+id/notificacoes"
+        android:name="com.kingdom.controledeestoque.Notificacoes"
+        android:label="activity_notificacoes"
+        tools:layout="@layout/activity_notificacoes" />
+</navigation>

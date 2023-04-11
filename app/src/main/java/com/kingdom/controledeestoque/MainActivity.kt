@@ -1,9 +1,7 @@
 package com.kingdom.controledeestoque
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
@@ -11,26 +9,18 @@ import android.provider.AlarmClock
 import android.provider.Settings
 import android.view.*
 import android.widget.*
-import android.support.*
 import android.util.Log
 import android.view.View.*
-import kotlin.system.*
 import kotlinx.coroutines.*
-import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet.Constraint
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import com.kingdom.controledeestoque.SQLiteHelper
 import com.kingdom.controledeestoque.database.Sync
 import com.kingdom.controledeestoque.database.confirmUnPw
 import java.lang.Integer.parseInt
 import java.util.*
-import kotlin.coroutines.coroutineContext
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,9 +58,10 @@ class MainActivity : AppCompatActivity() {
 
 
         fun syncIsDone(){
+            val username = user.text.toString()
 
-            var mainMenu = Intent(this, MainMenu::class.java).apply {
-                putExtra(AlarmClock.EXTRA_MESSAGE, user.text.toString())
+            var mainMenu = Intent(this, Main_nav::class.java).apply {
+                putExtra(AlarmClock.EXTRA_MESSAGE, username)
             }
             startActivity(mainMenu)
 
@@ -79,9 +70,7 @@ class MainActivity : AppCompatActivity() {
 
 
         //Exibir número de versão + revisão
-        var versionCode = BuildConfig.VERSION_CODE
-        var versionName = BuildConfig.VERSION_NAME
-        var version = "Versão: $versionName. Revisão: $versionCode"
+
 
         var query: String
 
@@ -189,9 +178,10 @@ class MainActivity : AppCompatActivity() {
 
 
                     var message = runSync()
+
                     if (message == "Sucesso"){
-                        var mainMenu = Intent(this, MainMenu::class.java).apply {
-                            putExtra(AlarmClock.EXTRA_MESSAGE, user.text.toString())
+                        var mainMenu = Intent(this, Main_nav::class.java).apply {
+                            putExtra(AlarmClock.EXTRA_MESSAGE, username)
                         }
                         startActivity(mainMenu)
 
@@ -221,8 +211,8 @@ class MainActivity : AppCompatActivity() {
                 var auth = db.externalExecSQLSelect(user.text.toString(), pw.text.toString())
                 //Log.d("Debug", "Cursor = $cursor")
                 if (auth == true) {
-                    var username = user.text.toString()
-                    var mainMenu = Intent(this, MainMenu::class.java).apply {
+                    val username = user.text.toString()
+                    var mainMenu = Intent(this, Main_nav::class.java).apply {
                         putExtra(AlarmClock.EXTRA_MESSAGE, username)
                     }
                     startActivity(mainMenu)
@@ -278,8 +268,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    var versionCode = BuildConfig.VERSION_CODE
-    var versionName = BuildConfig.VERSION_NAME
+
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -287,10 +276,7 @@ class MainActivity : AppCompatActivity() {
         R.id.versionView -> {
             // User chose the "Settings" item, show the app settings UI...
 
-            Toast.makeText(
-                applicationContext,
-                "Versão: $versionName", Toast.LENGTH_SHORT
-            ).show()
+
             true
         }
 

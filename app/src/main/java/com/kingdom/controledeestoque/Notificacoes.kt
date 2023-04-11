@@ -1,83 +1,91 @@
 package com.kingdom.controledeestoque
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.AlarmClock
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.View.INVISIBLE
+import android.view.*
 import android.view.View.VISIBLE
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.BundleCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.coroutines.GlobalScope.coroutineContext
-import kotlin.coroutines.coroutineContext
 
-class Notificacoes : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_notificacoes)
+class Notificacoes(username: String, context: Context) : Fragment() {
+    val username = username
+    val contextNav = context
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.activity_notificacoes, container, false).apply {
 
-        window.decorView.apply {
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            systemUiVisibility =
-                View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        }
+
+
+        var ctxt = getActivity()?.getApplicationContext()
+
+
         val toolbar = findViewById<Toolbar>(R.id.topAppBar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.apply {
-            // show back button on toolbar
-            // on back button press, it will navigate to parent activity
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowCustomEnabled(false)
 
-        }
 
-        val username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE).toString()
-        val cursor = SQLiteHelper(this).getInternalNotificacao(username)
-        var ctxt = this
+        //val username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE).toString()
+        val cursor = SQLiteHelper(ctxt).getInternalNotificacao(username)
+        //var ctxt = this
 
+        var recycleView = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerViewNotificacao)
 
         var swipe = findViewById<SwipeRefreshLayout>(R.id.swipe)
         swipe.setOnRefreshListener {
+            update()
+            /*recycleView.adapter = null
+            recycleView.layoutManager = null*/
             CoroutineScope(Dispatchers.Unconfined).launch {
+
                 try {
-                    Sync().sync(2, ctxt)
+                    ctxt?.let { Sync().sync(2, it) }
+
                 } catch (e: Exception){}
-                MainScope().run {
+                val cursorUpdate = SQLiteHelper(ctxt).getInternalNotificacao(username)
+
+                MainScope().launch{
+                /*MainScope().run {
+
 
                     startActivity(getIntent())
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-                    finish()
+                    finish()*/
+
+                    recycleView.adapter = ctxt?.let { RecyclerAdapter(cursorUpdate, contextNav) }
+                    recycleView.adapter?.notifyDataSetChanged()
+                    recycleView.layoutManager = LinearLayoutManager(ctxt)
+                    swipe.isRefreshing = false
+
                 }
             }
         }
 
 
-        var recycleView = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerViewNotificacao)
-        recycleView.adapter = RecyclerAdapter(cursor, this)
-        recycleView.layoutManager = LinearLayoutManager(this)
-        recycleView.setHasFixedSize(true)
+
+        recycleView.adapter = ctxt?.let { RecyclerAdapter(cursor, contextNav) }
+        recycleView.layoutManager = LinearLayoutManager(ctxt)
+        //recycleView.setHasFixedSize(true)
+        recycleView.adapter?.notifyDataSetChanged()
 
     }
-    override fun onSupportNavigateUp(): Boolean {
+    fun update(){
+        super.onDestroy()
+        super.onCreate(Bundle())
+    }
+    /*override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun Options(menu: Menu, inflater: MenuInflater) {
         menuInflater.inflate(R.menu.notificacoes, menu)
-        return true
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
@@ -109,6 +117,6 @@ class Notificacoes : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
-    }
+    }*/
 
 }

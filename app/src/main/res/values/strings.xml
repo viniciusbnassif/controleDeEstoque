@@ -11,4 +11,10 @@
     <string name="connectionErroResult2">Servidor não encontrado nessa rede (Endereço e porta indisponíveis para esta rede)</string>
     <string name="connectionErroResult1">Não foi possível estabelecer uma conexão com o servidor</string>
     <string name="sincComSucesso">Sincronizado com sucesso</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main_nav">Main_nav</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

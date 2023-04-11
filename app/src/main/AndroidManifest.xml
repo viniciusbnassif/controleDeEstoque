@@ -20,15 +20,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
-            android:name=".Menu_Principal"
-            android:exported="false">
+            android:name=".Main_nav"
+            android:exported="false"
+            android:label="@string/title_activity_main_nav">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
             android:name=".Notificacoes"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />

@@ -205,6 +205,24 @@ class SQLiteHelper(context: Context?):
         db.execSQL(dropDBPCP)
         onCreate(db)
     }
+    fun countNotf(username: String): Int {
+        var result = db.query(
+            TBL_NOTIF,
+            arrayOf("$ID_NOTIF AS ${BaseColumns._ID}"
+            ),
+            "$LIDO = 'N' AND $USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (result != null && result.getCount() > 0) {
+            return result.count
+        }else{
+            return 0
+        }
+
+    }
 
     fun getArmz(): Cursor {
         return db.query(

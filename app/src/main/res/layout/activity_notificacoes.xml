@@ -29,7 +29,6 @@
                 android:background="@color/colorPrimary"
                 app:navigationIconTint="@color/white"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:menu="@menu/notificacoes"
                 app:title="Notificações"
                 app:titleTextColor="@color/white" />
 
