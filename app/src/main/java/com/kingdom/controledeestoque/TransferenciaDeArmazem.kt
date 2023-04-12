@@ -1,7 +1,6 @@
 package com.kingdom.controledeestoque
 
 import android.icu.text.SimpleDateFormat
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.AlarmClock
@@ -9,7 +8,9 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -21,25 +22,21 @@ import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.*
 import java.lang.Float.parseFloat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class TransferenciaDeArmazem : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transferencia_de_armazem)
 
-        window.decorView.apply {
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            systemUiVisibility = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        }
-
         var bottomAppBar = findViewById<BottomAppBar>(R.id.bottomAppBar)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView.rootView) { _, insets ->
 
             //This lambda block will be called, every time keyboard is opened or closed
+
+            getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            val view = window.decorView
+            view.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+            //view.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
 
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())

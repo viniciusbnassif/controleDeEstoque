@@ -69,8 +69,10 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
                 progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
                 syncBtn.setText("Falha ao sincronizar")
-                buttonTrArmz.setEnabled(false)
-                buttonTrArmz.setText("Falha ao sincronizar")
+                buttonTrArmz.setEnabled(true)
+                buttonTrArmz.setText("Falha ao sincronizar\nTransferência de armazem")
+
+                // IMPLEMENTAR MUDANÇA: TELA DE NOTIFICAÇÕES DEVE FICAR BLOQUEADA ATÉ FINAL DA SINCRONIZAÇÃO
 
                 if (ctxt != null) {
                     MaterialAlertDialogBuilder(ctxt)

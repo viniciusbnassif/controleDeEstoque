@@ -2,38 +2,34 @@ package com.kingdom.controledeestoque
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.AlarmClock
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.kingdom.controledeestoque.databinding.ActivityMainNavBinding
 
 class Main_nav : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainNavBinding
+
     lateinit var username : String
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_nav)
 
-        window.decorView.apply {
-            // Hide both the navigation bar and the status bar.
-            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-            // a general rule, you should design your app to hide the status bar whenever you
-            // hide the navigation bar.
-            systemUiVisibility =
-                View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this,R.color.white));
+            var view = getWindow().getDecorView();
+            view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
         }
+
 
 
         //bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
@@ -69,11 +65,13 @@ class Main_nav : AppCompatActivity() {
     }
     fun updateBadge(count: Int) {
         var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        var badge = bottomNavigationView.getOrCreateBadge(R.id.notificacoes)
         if (count != 0) {
-            var badge = bottomNavigationView.getOrCreateBadge(R.id.notificacoes)
             badge.isVisible = true
             // An icon only badge will be displayed unless a number or text is set:
             badge.number = count
+        } else {
+            badge.isVisible = false
         }
     }
 
