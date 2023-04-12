@@ -42,11 +42,13 @@
         </com.google.android.material.appbar.AppBarLayout>
 
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scrollIndicators="right"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewNotificacao"
@@ -58,8 +60,16 @@
                 tools:listitem="@layout/item_notificacao"></androidx.recyclerview.widget.RecyclerView>
 
 
-
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/aviso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Não há dados a serem exibidos no momento."
+            android:textAlignment="center"
+            android:visibility="gone" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

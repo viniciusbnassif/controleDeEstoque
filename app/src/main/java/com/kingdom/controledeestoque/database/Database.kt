@@ -424,7 +424,7 @@ class SQLiteHelper(context: Context?):
                 USERNAME,
                 LIDO
             ),
-            "$LIDO = 'N' AND $USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            "$USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
             null /* GROUP BY clause, null if no GROUP BY clause */,
             null /* HAVING CLAUSE, null if no HAVING clause */,
@@ -435,6 +435,59 @@ class SQLiteHelper(context: Context?):
         }
         return cursor
     }
+
+    fun setNotificationRead(id: Int?) {
+        var query: String
+        if (id != null){
+            query = "UPDATE $TBL_NOTIF " +
+                    "SET $LIDO = 'S' " +
+                    "WHERE $ID_NOTIF = $id"
+            db.execSQL(query)
+        }
+    }
+    fun getNotificationRead(): Cursor? {
+        var cursor = db.query(
+            TBL_NOTIF,
+            arrayOf(
+                "$ID_NOTIF AS ${BaseColumns._ID}",
+            ),
+            "$LIDO = 'S'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            ID_NOTIF + " DESC" //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        return cursor
+    }
+    fun arrayIdNotf(): ArrayList<Int>? {
+        var cursor = db.query(
+            TBL_NOTIF,
+            arrayOf(
+                "$ID_NOTIF AS ${BaseColumns._ID}",
+            ),
+            null /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            ID_NOTIF //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        var cursorArray = ArrayList<Int>()
+        cursor.moveToFirst()
+        cursorArray.add(cursor.getInt(0))
+        while (cursor.moveToNext()) {
+            cursorArray.add(
+                cursor.getInt(0)
+            )
+        }
+        return cursorArray
+    }
+
 
     fun insertDone(id: Int?) {
         var query: String

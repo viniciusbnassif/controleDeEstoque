@@ -46,15 +46,16 @@ class Main_nav : AppCompatActivity() {
         val Relatorio=Relatorio()
         val Notificacoes=Notificacoes(username, this)
 
+
         setCurrentFragment(MainMenu)
 
         var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         bottomNavigationView.setOnNavigationItemSelectedListener {
+            getCount(SQLiteHelper(this).countNotf(username))
             when(it.itemId){
                 R.id.menu->setCurrentFragment(MainMenu)
                 R.id.relatorioNav->setCurrentFragment(Relatorio)
                 R.id.notificacoes->setCurrentFragment(Notificacoes)
-
             }
             true
         }
@@ -83,5 +84,5 @@ class Main_nav : AppCompatActivity() {
             replace(R.id.nav_host_fragment_activity_main_nav,fragment)
             commit()
         }
-
+    public val mainNavContext = this
 }

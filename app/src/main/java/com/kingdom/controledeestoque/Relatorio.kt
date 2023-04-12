@@ -34,7 +34,7 @@ class Relatorio : Fragment() {
         myWebView.settings.setSupportZoom(true)
         myWebView.settings.javaScriptEnabled = true
         myWebView.settings.loadWithOverviewMode = true
-        myWebView.loadUrl("http://192.168.1.10/report_server/Pages/ReportViewer.aspx?%2fLiderMinas%2fRLM0077&rs:Command=Render")
+        myWebView.loadUrl("http://192.168.1.10/report_server/Pages/ReportViewer.aspx?%2fLiderMinas%2fRLM0078&rs:Command=Render")
 
 
 

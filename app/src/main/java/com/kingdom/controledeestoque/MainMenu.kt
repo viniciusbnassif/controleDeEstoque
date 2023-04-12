@@ -2,9 +2,9 @@ package com.kingdom.controledeestoque
 
 //
 //import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
@@ -13,8 +13,6 @@ import android.provider.Settings
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -23,13 +21,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.kingdom.controledeestoque.database.Sync
-import com.kingdom.controledeestoque.Main_nav
 import kotlinx.coroutines.*
 
 
@@ -216,10 +212,19 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
             }
         }
 
+        fun updateBadge(){ //Esse metodo atualiza o contador na barra de navegação
+            var cursor = username?.let { SQLiteHelper(ctxt).countNotf(it) } //Conta quantas notificações não lidas existem para o usuario atual
+            if (cursor != null) { //Por segurança, se o resultado for nulo (muito dificil) ele não fará nada.
+
+                val activity: Activity? = activity //Instancia a atividade
+                if (activity is Main_nav) { //confirma se a atividade foi instanciada
+                    val myactivity: Main_nav? = activity as Main_nav?
+                    myactivity?.getCount(cursor) //executa o metodo que atualiza o contador, passando o numero obtido pelo cursor na primeira linha da função.
+                }
+            }
+        }
+
         suspend fun synchronization() {
-
-
-
             var msg = ""
 
             MainScope().async {
@@ -240,10 +245,7 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
 
                     if (r == "Sucesso"){
                         MainScope().launch {
-                            var mhmm = username?.let { SQLiteHelper(ctxt).countNotf(it) }
-                            if (mhmm != null) {
-                                Main_nav().getCount(mhmm)
-                            }
+                            updateBadge()
                             try {
                                 showProgress("false")
                                 Log.d("run?", "run?")
@@ -287,6 +289,7 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
         }
 
 
+
         //val username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)
         val username = username
         var saudacao = "Bem-vindo, ${username}" // 11
@@ -321,46 +324,6 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
 
     }
 
-
-
-    /* When the activity is destroyed then close the cursor as it will not be used again */
-
-
-    /* When the activity is destroyed then close the cursor as it will not be used again */
-
-
-
-
-    /*val lifecycleEventObserver = LifecycleEventObserver { source, event ->
-        if (event == Lifecycle.Event.ON_RESUME ) {
-            Log.e( "APP" , "resumed" )
-        }
-        else if ( event == Lifecycle.Event.ON_PAUSE ) {
-            Log.e( "APP" , "paused" )
-        }
-    }
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        MainScope().launch() {
-            when(event){
-
-
-                Lifecycle.Event.ON_STOP -> {
-                }
-                Lifecycle.Event.ON_CREATE -> Sync().testConnection()
-
-                Lifecycle.Event.ON_START -> {
-                }
-                Lifecycle.Event.ON_RESUME -> {
-                }
-                Lifecycle.Event.ON_PAUSE -> {
-                }
-                Lifecycle.Event.ON_DESTROY -> finish()
-                Lifecycle.Event.ON_ANY -> {
-                }
-            }
-        }
-    }*/
 
 
 

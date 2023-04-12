@@ -1,8 +1,13 @@
 package com.kingdom.controledeestoque
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Color
+import android.graphics.Color.WHITE
+import android.graphics.Color.parseColor
+import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +21,7 @@ import com.kingdom.controledeestoque.database.getNotificacao
 public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     var cursor = cursorE
     var ctxt = context
+
     public class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val title = itemView.findViewById<TextView>(R.id.titleID)
         val armzOrigem = itemView.findViewById<TextView>(R.id.armzOrigem)
@@ -25,6 +31,7 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
         val mensagem = itemView.findViewById<TextView>(R.id.mensagem)
         val dty = itemView.findViewById<TextView>(R.id.hora)
         val card = itemView.findViewById<CardView>(R.id.card)
+        val read = itemView.findViewById<View>(R.id.read)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,6 +45,9 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
             cursor!!.moveToPosition(position)
             var dados = cursor?.getString(3)?.split("|")?.toTypedArray()
             var msg = cursor?.getString(1)
+            var lido = cursor?.getString(5)
+            var user = cursor?.getString(4)
+            var id = cursor?.getInt(0)
 
 
             holder.title.text = dados!![0]
@@ -48,7 +58,19 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
             holder.dty.text = dados!![5]
             holder.mensagem.text = "Mensagem: \n${dados!![6]}"
 
+
+            if (lido == "N") {
+                holder.read.visibility = View.VISIBLE
+                holder.card.setCardBackgroundColor(parseColor("#E1F3FF"))
+            } else {
+                holder.read.visibility = View.INVISIBLE
+                holder.card.setCardBackgroundColor(WHITE)
+            }
+
             holder.card.setOnClickListener{
+                SQLiteHelper(ctxt).setNotificationRead(id)
+                holder.read.visibility = View.INVISIBLE
+                holder.card.setCardBackgroundColor(WHITE)
                 MaterialAlertDialogBuilder(ctxt)
                     .setTitle("Mensagem detalhada")
                     .setMessage(msg)
@@ -56,9 +78,15 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
                         dialog.dismiss()
                     }
                     .show()
+
+                if (user != null) {
+
+                    Notificacoes(user, ctxt).updateBadge()
+                }
             }
             //cursor!!.moveToNext()
         }
+
     }
 
     override fun getItemCount(): Int {

@@ -40,21 +40,6 @@ class Connection(private val coreConnection: java.sql.Connection) :
     lateinit var produtos: Array<String>
 
 
-    /*fun startConn() {
-        val policy: StrictMode.ThreadPolicy = Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        try {
-            Class.forName(Classes)
-            connection = DriverManager.getConnection(url, username, password)
-            Log.d("Debug: ", "Connected")
-        } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
-            Log.d("Debug: ", "Class fail")
-        } catch (e: SQLException) {
-            e.printStackTrace()
-            Log.d("Debug" , "Connected no")
-        }
-    }*/
 
     override fun close() {
         coreConnection.close()
@@ -289,14 +274,27 @@ fun getNotificacao(context: Context?) {
              ORDER BY $id
             """.trimIndent()
         )
-        dbIntrn.externalExecSQL("DELETE FROM $tbl")
+
+        var array = dbIntrn.arrayIdNotf()
+        //dbIntrn.externalExecSQL("DELETE FROM $tbl")
         while (resultSet1.next()){
-            count += 1
-            var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
-                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
-                    "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
-            dbIntrn.externalExecSQL(query)
-            Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
+
+            if (array != null) {
+                if (!array.contains(resultSet1.getInt("$id"))){
+                    var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
+                            "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
+                            "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
+                    dbIntrn.externalExecSQL(query)
+                    Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
+
+                }
+            } else {
+                var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
+                        "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
+                        "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
+                dbIntrn.externalExecSQL(query)
+                Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
+            }
         }
 
         resultSet1.close()
@@ -346,6 +344,48 @@ fun movimentoToServer(context: Context) {
             }while (localResult.moveToNext())
 
 
+        }
+        if (result != null) {
+            result.close()
+        }
+        if (localResult != null) {
+            localResult.close()
+        }
+        st1.close()
+        connect()?.close()
+    }
+}
+
+fun notificationRead(context: Context) {
+    var dbIntrn = SQLiteHelper(context)
+
+    var result = dbIntrn.getNotificationRead()
+    var localResult = result
+
+    connect().use {
+
+        var st1 = it?.createStatement()!!
+        if (localResult != null && localResult.getCount() > 0) {
+            localResult.moveToFirst()
+            do {
+                var id = localResult.getInt(0)
+                try {
+                    var insert = (
+                        """
+                        UPDATE Notificacao SET lido = 'S' WHERE idNotificacao = ${localResult.getInt(0)}
+                        """.trimIndent())
+                    Log.d("Update notification as read", insert)
+
+                    var comm = st1.connection.prepareStatement(insert)
+                    comm.executeUpdate()
+                    dbIntrn.insertDone(id)
+                } catch (e: ClassNotFoundException){
+                    Log.e("Error SQL CNFE", e.toString())
+                }
+                catch (se: SQLException){
+                    Log.e("Error SQLE", se.toString())
+                }
+            }while (localResult.moveToNext())
         }
         if (result != null) {
             result.close()

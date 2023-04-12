@@ -76,8 +76,8 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
                     if (cod == 0 || cod == 1 || cod == 2) {
 
                         getNotificacao(ctxt)
-                        //queryExternalServerAE(ctxt)
-                        //queryExternalServerAP(ctxt)
+                        notificationRead(ctxt)
+
                         if (cod == 2) {
                             message = "Sucesso" //Sincronizado com sucesso
                             return@withContext message
@@ -86,8 +86,7 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
                     if (cod == 0 || cod == 1) {
 
                         movimentoToServer(ctxt)
-                        //queryExternalServerAE(ctxt)
-                        //queryExternalServerAP(ctxt)
+
                         if (cod == 1) {
                             message = "Sucesso" //Sincronizado com sucesso
                             return@withContext message
