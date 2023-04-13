@@ -166,6 +166,7 @@ fun getArmz(context: Context?) {
 
         resultSet1.close()
         st1.close()
+        //dbIntrn.close()
 
     }
 }
@@ -204,6 +205,7 @@ fun getSaldo(context: Context?) {
 
         resultSet1.close()
         st1.close()
+        //dbIntrn.close()
 
     }
 }
@@ -245,6 +247,7 @@ fun getSlLote(context: Context?) {
 
         resultSet1.close()
         st1.close()
+        //dbIntrn.close()
 
     }
 }
@@ -296,6 +299,7 @@ fun getNotificacao(context: Context?) {
                 Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
             }
         }
+        //dbIntrn.close()
 
         resultSet1.close()
         st1.close()
@@ -333,12 +337,14 @@ fun movimentoToServer(context: Context) {
                     comm.executeUpdate()
                     //comm.connection.commit()
                     dbIntrn.insertDone(id)
+
                 } catch (e: ClassNotFoundException){
                     Log.e("Error SQL CNFE", e.toString())
                 }
                 catch (se: SQLException){
                     Log.e("Error SQLE", se.toString())
                 }
+
 
                 //result.moveToNext()
             }while (localResult.moveToNext())
@@ -395,6 +401,7 @@ fun notificationRead(context: Context) {
         }
         st1.close()
         connect()?.close()
+        dbIntrn.close()
     }
 }
 

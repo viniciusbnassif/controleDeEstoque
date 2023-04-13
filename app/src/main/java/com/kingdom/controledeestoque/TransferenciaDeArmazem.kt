@@ -373,7 +373,9 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                     if (Looper.myLooper() == null) {
                         Looper.prepare()
                     }
-                    Sync().sync(1, ctxt)
+                    /*MainScope().launch {
+                        Sync().sync(1, applicationContext)
+                    }*/
                 } catch (e: Exception){}
                 cancel()
             }
@@ -400,6 +402,17 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             //limpar campos aqui
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SQLiteHelper(this).close()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SQLiteHelper(this).close()
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true

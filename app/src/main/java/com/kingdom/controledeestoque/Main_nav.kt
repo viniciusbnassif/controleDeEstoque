@@ -60,6 +60,20 @@ class Main_nav : AppCompatActivity() {
 
         //updateBadge(this, username)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SQLiteHelper(this).close()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SQLiteHelper(this).close()
+    }
+
+
+
+
     fun getCount(count: Int){
         updateBadge(count)
     }

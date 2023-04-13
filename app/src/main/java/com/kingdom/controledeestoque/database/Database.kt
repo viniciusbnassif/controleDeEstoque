@@ -165,6 +165,7 @@ class SQLiteHelper(context: Context?):
         //
     }
 
+
     fun externalExecSQL(query: String){
         val db = this.writableDatabase
         db?.execSQL(query)

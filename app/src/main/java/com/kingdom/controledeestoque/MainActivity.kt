@@ -258,6 +258,16 @@ class MainActivity : AppCompatActivity() {
         NotificationManager(this).NotificacaoErro( "produto", "Guilherme é um cagão","MensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhada", calendar.getTimeInMillis())
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        SQLiteHelper(this).close()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        SQLiteHelper(this).close()
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_actv, menu)
