@@ -305,6 +305,7 @@ fun getNotificacao(context: Context?) {
         st1.close()
 
     }
+    connect()?.close()
 }
 
 fun movimentoToServer(context: Context) {
@@ -384,7 +385,7 @@ fun notificationRead(context: Context) {
 
                     var comm = st1.connection.prepareStatement(insert)
                     comm.executeUpdate()
-                    dbIntrn.insertDone(id)
+                    comm.close()
                 } catch (e: ClassNotFoundException){
                     Log.e("Error SQL CNFE", e.toString())
                 }
@@ -400,9 +401,9 @@ fun notificationRead(context: Context) {
             localResult.close()
         }
         st1.close()
-        connect()?.close()
         dbIntrn.close()
     }
+    connect()?.close()
 }
 
 /*fun queryExternalServerAP(context: Context) {

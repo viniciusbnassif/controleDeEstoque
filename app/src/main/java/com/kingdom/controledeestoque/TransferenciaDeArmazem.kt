@@ -373,9 +373,9 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                     if (Looper.myLooper() == null) {
                         Looper.prepare()
                     }
-                    /*MainScope().launch {
+                    MainScope().launch {
                         Sync().sync(1, applicationContext)
-                    }*/
+                    }
                 } catch (e: Exception){}
                 cancel()
             }
