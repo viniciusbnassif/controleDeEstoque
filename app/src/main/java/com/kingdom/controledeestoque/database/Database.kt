@@ -10,6 +10,42 @@ import android.util.Log
 //import com.liderMinas.PCP.database.connectMSSQL
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*import android.database.sqlite.SQLiteQuery*/
 
 

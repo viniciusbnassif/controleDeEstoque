@@ -93,7 +93,6 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
                         }
                     }
                     if (cod == 0) {
-
                         getProdutoExt(ctxt)
                         getArmz(ctxt)
                         getSaldo(ctxt)
@@ -143,43 +142,13 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
 
             }
         }
-
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
 
     }
-    /*@OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun appInResumeState() {
-        Toast.makeText(this,"In Foreground", Toast.LENGTH_LONG).show();
-    }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun appInStopState() {
-        Toast.makeText(this,"Stopped", Toast.LENGTH_LONG).show();
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun appInPauseState() {
-        Toast.makeText(this,"In Background", Toast.LENGTH_LONG).show();
-    }
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        TODO("Not yet implemented")
-    }*/
 
 }
 
 
-/*class LoadContent: AppCompatActivity(){
-    suspend fun loadContent(ctxt: android.content.Context): String{
-
-
-        var message : String = CoroutineScope(Dispatchers.Unconfined).run {
-            var str = Sync().sync(0, ctxt)
-        }
-
-
-        return message
-    }
-}*/

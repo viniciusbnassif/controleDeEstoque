@@ -170,6 +170,45 @@ fun getArmz(context: Context?) {
 
     }
 }
+
+fun getArmzTest(context: Context?) {
+
+    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)
+
+    var count = 0
+
+    var tbl = "Armazem"
+    var id = "idArmazem"
+    var cod = "codArmazem"
+    var desc = "descArmazem"
+
+    val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        val st1 = it?.createStatement()!!
+        val resultSet1 = st1.executeQuery(
+            """
+            SELECT *
+              FROM $tbl
+             ORDER BY idArmazem
+            """.trimIndent()
+        )
+        dbIntrn.externalExecSQL("DELETE FROM $tbl")
+        while (resultSet1.next()){
+            count += 1
+            var query = "INSERT INTO $tbl ($id, $cod, $desc) " +
+                    "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$cod")}', '${resultSet1.getString("$desc")}') "
+            dbIntrn.externalExecSQL(query)
+            Log.d("SQL Insert Armz", "${resultSet1.getString("$desc")} inserido com sucesso (${resultSet1.getInt("$id")})")
+        }
+
+        resultSet1.close()
+        st1.close()
+        //dbIntrn.close()
+
+    }
+}
+
 fun getSaldo(context: Context?) {
 
     val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
