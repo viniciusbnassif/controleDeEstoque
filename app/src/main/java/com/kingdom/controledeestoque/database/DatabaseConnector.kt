@@ -349,7 +349,6 @@ fun getNotificacao(context: Context?) {
 
 fun movimentoToServer(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
-
     var result = dbIntrn.getInternalMovimento()
     var localResult = result
 

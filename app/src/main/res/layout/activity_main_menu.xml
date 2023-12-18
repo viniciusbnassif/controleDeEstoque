@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
 
-                android:visibility="invisible" />
+                android:visibility="gone" />
 
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -73,35 +73,56 @@
             android:id="@+id/CL"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="0px"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-            <TextView
-                android:id="@+id/saudacao"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/saudacaoContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bem-vindo"
-                android:textSize="24sp"
-                app:layout_constraintBottom_toTopOf="@+id/trArmz"
+                android:background="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
+                <TextView
+                    android:id="@+id/saudacao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="Bem-vindo"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/sair"
+                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Finalizar \nSessão"
+                    app:icon="@drawable/baseline_login_24"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Button
                 android:id="@+id/trArmz"
-                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
+                style="@style/Widget.Material3.Button.ElevatedButton.Icon"
                 android:layout_width="0dp"
                 android:layout_height="108dp"
                 android:layout_marginStart="64dp"
                 android:layout_marginEnd="64dp"
                 android:text="Transferência de armazem"
                 android:textSize="20sp"
-                app:cornerRadius="10dp"
                 app:layout_constraintBottom_toTopOf="@+id/linearLayout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/saudacao" />
+                app:layout_constraintTop_toBottomOf="@id/saudacaoContainer" />
 
             <Button
                 android:id="@+id/apPerdas"

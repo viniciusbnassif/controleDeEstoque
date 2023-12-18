@@ -41,6 +41,7 @@ class Main_nav : AppCompatActivity() {
         val MainMenu=MainMenu(username)
         val Relatorio=Relatorio()
         val Notificacoes=Notificacoes(username, this)
+        val Requisicao=Requisicao(username, this)
 
 
         setCurrentFragment(MainMenu)
@@ -52,6 +53,7 @@ class Main_nav : AppCompatActivity() {
                 R.id.menu->setCurrentFragment(MainMenu)
                 R.id.relatorioNav->setCurrentFragment(Relatorio)
                 R.id.notificacoes->setCurrentFragment(Notificacoes)
+                R.id.requisicoes->setCurrentFragment(Requisicao)
             }
             true
         }

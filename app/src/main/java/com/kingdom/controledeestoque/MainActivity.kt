@@ -1,5 +1,8 @@
 package com.kingdom.controledeestoque
 
+import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
@@ -14,6 +17,7 @@ import android.util.Log
 import android.view.View.*
 import kotlinx.coroutines.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -25,10 +29,10 @@ import java.lang.Integer.parseInt
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
 
         var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
@@ -255,7 +259,12 @@ class MainActivity : AppCompatActivity() {
         calendar.set(Calendar.MINUTE, parseInt(dmi[1]))
 
         var date = "01/01/2023"//.toLong()
-        NotificationManager(this).NotificacaoErro( "produto", "Guilherme é um cagão","MensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhada", calendar.getTimeInMillis())
+        //,,,0NotificationManager(this).NotificacaoErro( "produto", "teste","MensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhada", calendar.getTimeInMillis())
+    }
+
+    companion object {
+        const val NOTIFICATION_ID = 101
+        const val CHANNEL_ID = "channelID"
     }
 
     override fun onDestroy() {

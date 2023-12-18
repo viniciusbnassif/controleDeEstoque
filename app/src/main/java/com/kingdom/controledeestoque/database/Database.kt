@@ -9,43 +9,6 @@ import android.util.Log
 
 //import com.liderMinas.PCP.database.connectMSSQL
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*import android.database.sqlite.SQLiteQuery*/
 
 
@@ -362,7 +325,6 @@ class SQLiteHelper(context: Context?):
             return null
         }
         return cursor
-
     }
 
     fun getLote(armzOrig: String, codProd: String): Cursor? {
@@ -449,6 +411,23 @@ class SQLiteHelper(context: Context?):
             return null
         }
         return cursor
+    }
+
+    fun getProdutos(): Cursor {
+        return db.query(
+            TBL_PRODUTO,
+            arrayOf("$ID_PRODUTO AS ${BaseColumns._ID}",
+                DESC_PROD,
+                /*QE_PROD,
+                VALID_PROD,
+                TIPOV_PROD*/
+            ),
+            null /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+            null /* GROUP BY clause, null if no GROUP BY clause */,
+            null /* HAVING CLAUSE, null if no HAVING clause */,
+            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+        )
     }
     fun getInternalNotificacao(username: String): Cursor? {
         var cursor = db.query(

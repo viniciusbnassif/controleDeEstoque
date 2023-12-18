@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_baseline_notifications_24"
         android:iconTint="@color/colorPrimary"
         android:title="Notificações" />
+    <item
+        android:id="@+id/requisicoes"
+        android:icon="@drawable/ic_baseline_info_24"
+        android:iconTint="@color/colorPrimary"
+        android:title="Notificações" />
 </menu>

@@ -15,7 +15,6 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
         super.onCreate(savedInstanceState)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-
     }
 
     suspend fun testConnection(): String? {

@@ -289,15 +289,23 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
 
 
         }
+        var intent: Intent
 
+        var sairBtn = findViewById<Button>(R.id.sair)
+        sairBtn.setOnClickListener {
+            MainScope().launch {
+                intent = Intent(ctxt, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
 
+            }
+        }
 
         //val username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)
         val username = username
         var saudacao = "Bem-vindo, ${username}" // 11
         findViewById<TextView>(R.id.saudacao).apply { text = saudacao }
 
-        var intent: Intent
 
 
 
