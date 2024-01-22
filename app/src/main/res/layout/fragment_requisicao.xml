@@ -26,9 +26,9 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                app:navigationIconTint="@color/white"
+                android:background="@color/appBarColor"
                 app:layout_scrollFlags="scroll|enterAlways"
+                app:navigationIconTint="@color/white"
                 app:title="Requisição"
                 app:titleTextColor="@color/white" />
 
@@ -47,34 +47,51 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollIndicators="right"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
+            android:scrollbars="horizontal|vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:swipeRefreshLayoutProgressSpinnerBackgroundColor="@color/material_dynamic_primary40">
 
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewNotificacao"
+                android:id="@+id/recyclerViewRequisicao"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/item_notificacao"></androidx.recyclerview.widget.RecyclerView>
+                tools:listitem="@layout/item_requisicao"></androidx.recyclerview.widget.RecyclerView>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/createReq"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="Criar nova requisição"
-            app:icon="@drawable/baseline_add_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_anchorGravity="bottom|right">
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/backToTop"
+                style="@style/Widget.Material3.Button.ElevatedButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Voltar ao topo"
+                app:icon="@drawable/baseline_keyboard_double_arrow_up_24"
+                app:layout_constraintBottom_toTopOf="@+id/createReq"
+                app:layout_constraintEnd_toEndOf="@+id/createReq" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/createReq"
+                style="@style/Widget.Material3.Button.ElevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Criar nova requisição"
+                app:icon="@drawable/baseline_add_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/aviso"

@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy.Builder
 import android.util.Log
+import androidx.core.database.getFloatOrNull
+import androidx.core.database.getStringOrNull
 import com.kingdom.controledeestoque.SQLiteHelper
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
@@ -375,7 +377,7 @@ fun movimentoToServer(context: Context) {
                     var comm = st1.connection.prepareStatement(insert)
                     comm.executeUpdate()
                     //comm.connection.commit()
-                    dbIntrn.insertDone(id)
+                    dbIntrn.insertDone("Movimento", id)
 
                 } catch (e: ClassNotFoundException){
                     Log.e("Error SQL CNFE", e.toString())
@@ -502,6 +504,286 @@ fun notificationRead(context: Context) {
         connect()?.close()
     }
 }*/
+
+fun uploadRequisicoes(context: Context) {
+    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
+
+    var result = dbIntrn.getReq()
+    var resultUpd = dbIntrn.getUpdReq()
+    var localResult = result
+    var localResultUpd = resultUpd
+
+    connect().use {
+
+        var st1 = it?.createStatement()!!
+        if (localResult != null && localResult.getCount() > 0) {
+            localResult.moveToFirst()
+            do {
+
+                var id = localResult?.getInt(0)
+
+                //var produto = dbIntrn.getDescProdutos(localResult.getInt(5))
+                //var motivo = dbIntrn.getDescMotivo(localResult.getInt(6))
+                //var produtoDesc = produto!!.getString(1)
+                //var motivoDesc = motivo!!.getString(1)
+                Log.d("upload Req", "$id")
+                try {
+
+
+                    lateinit var userAtend: String
+
+                    fun contentOrNull(any: Any?): Any? {
+                        if (any == null){
+                            return null
+                        } else /*if (any == String && any != null)*/{
+                            var anyS = "'" + "$any" + "'"
+                            Log.d("UpReq AnyS test", anyS)
+                            return anyS
+                        }
+                    }
+
+                    var insert = (
+                            """
+                            INSERT INTO Requisicao
+                            (codProduto, qtdRequisicao, qtdAtendida, qtdConfirmacao, userRequisicao, 
+                            userAtendimento, userConfirmacao, dataHoraRequisicao, dataHoraAtendimento, dataHoraConfirmacao)
+                            VALUES
+                            ('${localResult.getString(1)}', ${localResult.getFloat(2)}, 
+                            ${localResult.getFloatOrNull(3)},
+                            ${localResult.getFloatOrNull(4)},
+                            '${localResult.getString(5)}',
+                            ${contentOrNull(localResult.getStringOrNull(6))},
+                            ${contentOrNull(localResult.getStringOrNull(7))},
+                            ${contentOrNull(localResult.getStringOrNull(8))},
+                            ${contentOrNull(localResult.getStringOrNull(9))},
+                            ${contentOrNull(localResult.getStringOrNull(10))});
+                            """.trimIndent())
+                    Log.d("Upload Requisicao", insert)
+
+                    var query = """
+                        UPDATE Requisicao 
+                        SET statusSync = 1
+                        WHERE idRequisicao = ${localResult.getInt(0)}
+                    """.trimIndent()
+                    dbIntrn.externalExecSQL(query)
+
+                    var comm = st1.connection.prepareStatement(insert)
+                    comm.executeUpdate()
+
+
+                    //comm.connection.commit()
+                } catch (e: ClassNotFoundException){
+                    Log.e("Error SQL CNFE", e.toString())
+                }
+                catch (se: SQLException){
+                    Log.e("Error SQLE", se.toString())
+                }
+                dbIntrn.insertDone("Requisicao", id)
+
+                //result.moveToNext()
+            }while (localResult.moveToNext())
+
+
+        } else {
+            Log.d("uploadRequisicoes", "Erro")
+
+        }
+        dbIntrn.close()
+        st1.close()
+        connect()?.close()
+    }
+}
+
+fun uploadUpdRequisicoes(context: Context) {
+    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
+
+    var result = dbIntrn.getReq()
+    var resultUpd = dbIntrn.getUpdReq()
+    var localResult = result
+    var localResultUpd = resultUpd
+
+    connect().use {
+
+        var st1 = it?.createStatement()!!
+        if (localResultUpd != null && localResultUpd.getCount() > 0) {
+            localResultUpd.moveToFirst()
+            do {
+
+                var id = localResultUpd?.getInt(0)
+
+                //var produto = dbIntrn.getDescProdutos(localResult.getInt(5))
+                //var motivo = dbIntrn.getDescMotivo(localResult.getInt(6))
+                //var produtoDesc = produto!!.getString(1)
+                //var motivoDesc = motivo!!.getString(1)
+                Log.d("upload ReqUpd", "$id")
+                try {
+
+
+                    lateinit var userAtend: String
+
+                    fun contentOrNull(any: Any?): Any? {
+                        if (any == null){
+                            return null
+                        } else /*if (any == String && any != null)*/{
+                            var anyS = "'" + "$any" + "'"
+                            Log.d("UpReq AnyS test", anyS)
+                            return anyS
+                        }
+                    }
+
+                    var insert = (
+                            """
+                            UPDATE Requisicao 
+                            SET codProduto = '${localResultUpd.getString(1)}', 
+                            qtdRequisicao = ${localResultUpd.getFloat(2)},
+                            qtdAtendida = ${localResultUpd.getFloatOrNull(3)}, 
+                            qtdConfirmacao = ${localResultUpd.getFloatOrNull(4)}, 
+                            userRequisicao = '${localResultUpd.getString(5)}', 
+                            userAtendimento = ${contentOrNull(localResultUpd.getStringOrNull(6))}, 
+                            userConfirmacao = ${contentOrNull(localResultUpd.getStringOrNull(7))}, 
+                            dataHoraRequisicao = ${contentOrNull(localResultUpd.getStringOrNull(8))}, 
+                            dataHoraAtendimento = ${contentOrNull(localResultUpd.getStringOrNull(9))}, 
+                            dataHoraConfirmacao = ${contentOrNull(localResultUpd.getStringOrNull(10))}
+                            WHERE codProduto = '${localResultUpd.getString(1)}' AND  
+                            qtdRequisicao = ${localResultUpd.getFloat(2)} AND 
+                            userRequisicao = '${localResultUpd.getString(5)}' AND
+                            dataHoraRequisicao = ${contentOrNull(localResultUpd.getStringOrNull(8))};
+                            
+                            """.trimIndent())
+                    Log.d("Upload RequisicaoUpd", insert)
+
+                    var query = """
+                        UPDATE Requisicao 
+                        SET statusSync = 1
+                        WHERE idRequisicao = ${localResultUpd.getInt(0)}
+                    """.trimIndent()
+                    dbIntrn.externalExecSQL(query)
+
+                    var comm = st1.connection.prepareStatement(insert)
+                    comm.executeUpdate()
+
+
+                    //comm.connection.commit()
+                } catch (e: ClassNotFoundException){
+                    Log.e("Error SQL CNFE", e.toString())
+                }
+                catch (se: SQLException){
+                    Log.e("Error SQLE", se.toString())
+                }
+                dbIntrn.insertDone("Requisicao", id)
+
+                //result.moveToNext()
+            }while (localResultUpd.moveToNext())
+
+
+        } else {
+            Log.d("uploadRequisicoes Upd ", "Erro")
+
+        }
+        dbIntrn.close()
+        st1.close()
+        connect()?.close()
+    }
+}
+
+
+
+fun contentOrNullStr(any: Any): Any? {
+    if (any == null) {
+        Log.d("DwReq AnyS test", "null")
+        return null
+    } else {
+        var anyS = "'${any.toString()}'"
+        Log.d("DwReq AnyS test", anyS)
+        return anyS
+    }
+}
+fun contentOrNullFloat(any: Float?): Any? {
+    if (any == null) {
+        Log.d("DwReq AnyF test", "null")
+        return null
+    } else if (any?.toDouble() != 0.0) {
+        var anyS = any
+        Log.d("DwReq AnyF test", "$anyS")
+        return anyS
+    } else {
+        return null
+    }
+}
+
+var userAType: String? = null
+
+fun downloadRequisicoes(context: Context?) {
+
+    /*val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+    StrictMode.setThreadPolicy(policy)*/
+
+    val tbl = "Requisicao"
+    val id = "idRequisicao"
+    val cod = "codProduto"
+    val qtdR = "qtdRequisicao"
+    val qtdA = "qtdAtendida"
+    val qtdC = "qtdConfirmacao"
+    val userR = "userRequisicao"
+    val userA = "userAtendimento"
+    val userC = "userConfirmacao"
+    val dataR = "dataHoraRequisicao"
+    val dataA = "dataHoraAtendimento"
+    val dataC = "dataHoraConfirmacao"
+    //val lido = "lido"
+
+    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
+    connect().use {
+        var st1 = it?.createStatement()!!
+        var resultSet1 = st1.executeQuery(
+            """
+            SELECT *
+              FROM Requisicao
+             ORDER BY idRequisicao
+            """.trimIndent()
+        )
+        dbIntrn.externalExecSQL("DELETE FROM Requisicao")
+        Log.d("Table $tbl", "Table $tbl deleted")
+        while (resultSet1.next()){
+
+            fun checkNullorString(origin: String?): Any? {
+                if (resultSet1.getObject(origin) == null) {
+                    userAType = null
+                    return userAType
+                } else {
+                    userAType = resultSet1.getString(origin)
+                    return userAType
+                }
+            }
+            var query =
+                "INSERT INTO $tbl ($id, $cod, $qtdR, $qtdA, $qtdC, $userR, $userA, $userC, $dataR, $dataA, $dataC) " +
+                        "VALUES (${resultSet1.getInt("$id")}, " +
+                        "'${resultSet1.getString("$cod")}', " +
+                        "${contentOrNullFloat(resultSet1.getFloat("$qtdR"))}," +
+                        "${contentOrNullFloat(resultSet1.getFloat("$qtdA"))}," +
+                        "${contentOrNullFloat(resultSet1.getFloat("$qtdC"))}," +
+                        "${checkNullorString(userR)?.let { it1 -> contentOrNullStr(it1) }}," +
+                        "${checkNullorString(userA)?.let { it1 -> contentOrNullStr(it1) }}," +
+                        "${checkNullorString(userC)?.let { it1 -> contentOrNullStr(it1) }}, " +
+                        "${checkNullorString(dataR)?.let { it1 -> contentOrNullStr(it1) }}," +
+                        "${checkNullorString(dataA)?.let { it1 -> contentOrNullStr(it1) }}," +
+                        "${checkNullorString(dataC)?.let { it1 -> contentOrNullStr(it1) }}) "
+            dbIntrn.externalExecSQL(query)
+            Log.d(
+                "SQL Download Requisicao",
+                "${resultSet1.getString("$cod")} inserido com sucesso (${
+                    resultSet1.getInt("$id")
+                })"
+            )
+        }
+
+        dbIntrn.close()
+        st1.close()
+        connect()?.close()
+
+    }
+
+}
 
 fun confirmUnPw(username: String, password: String): Int {
     // Create an OkHttpClient object

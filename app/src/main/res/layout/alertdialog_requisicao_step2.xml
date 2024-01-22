@@ -5,55 +5,65 @@
     android:layout_height="wrap_content"
     android:layout_margin="12dp">
 
-    <com.google.android.material.divider.MaterialDivider
+
+    <!--Titulo deve ser algo como: "Quanto material será enviado:"-->
+
+    <!--com.google.android.material.divider.MaterialDivider
         android:id="@+id/div"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/viewSpinner"
+        app:layout_constraintBottom_toTopOf="@+id/textProdutoName"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" /-->
+
+    <TextView
+        android:id="@+id/nomePasso"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="Etapa"
+        app:layout_constraintBottom_toTopOf="@id/textProdutoName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/viewSpinner"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+        android:id="@+id/textProdutoName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:hint="Selecione o produto"
-        app:errorEnabled="true"
+        android:clickable="false"
+        app:layout_constraintTop_toBottomOf="@id/nomePasso"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/div">
+        app:layout_constraintStart_toStartOf="parent">
+        <!--app:layout_constraintTop_toBottomOf="@id/nomePasso"-->
 
-        <TextView
-            android:id="@+id/spinnerIdSaver"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextProdutoName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"></TextView>
-
-        <AutoCompleteTextView
-            android:id="@+id/spinnerPrd"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inputType="none"
-            android:textColor="@color/textColorPrimary"
-            app:simpleItemSelectedRippleColor="@color/textColorPrimary" />
+            android:layout_height="wrap_content"
+            android:text=""
+            android:hint="hint" />
     </com.google.android.material.textfield.TextInputLayout>
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/CL2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewSpinner">
+        app:layout_constraintTop_toBottomOf="@id/textProdutoName">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/subt1"
@@ -112,5 +122,32 @@
             app:layout_constraintWidth_percent="0.24" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/salvar"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:insetBottom="0dp"
+        android:text="Salvar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/CL2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/fechar"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:insetBottom="0dp"
+        android:text="Fechar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/salvar"
+        app:layout_constraintTop_toBottomOf="@id/CL2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
