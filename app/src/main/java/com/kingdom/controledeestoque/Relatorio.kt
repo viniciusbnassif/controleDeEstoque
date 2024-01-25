@@ -24,9 +24,6 @@ class Relatorio : Fragment() {
             = inflater.inflate(R.layout.activity_relatorio, container, false).apply {
 
 
-        val progress = findViewById<CircularProgressIndicator>(R.id.pIndicator)
-        progress.visibility = View.VISIBLE
-
         val myWebView: WebView = findViewById(R.id.webView)
         myWebView.webViewClient = WebViewClient()
         myWebView.clearCache(true)

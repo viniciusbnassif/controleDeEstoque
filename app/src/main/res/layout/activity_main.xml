@@ -20,10 +20,9 @@
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            app:titleTextColor="@color/white"
-            app:menu="@menu/main_actv"
-            app:title="Controle de Estoque" />
+            android:background="@color/appBarColor"
+            app:title="Controle de Estoque"
+            app:titleTextColor="@color/white" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progressToolbar"

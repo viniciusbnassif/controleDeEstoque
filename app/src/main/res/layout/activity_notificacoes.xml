@@ -26,9 +26,9 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                app:navigationIconTint="@color/white"
+                android:background="@color/appBarColor"
                 app:layout_scrollFlags="scroll|enterAlways"
+                app:navigationIconTint="@color/white"
                 app:title="Notificações"
                 app:titleTextColor="@color/white" />
 

@@ -18,7 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ControleDeEstoque"
         android:usesCleartextTraffic="true"
-        tools:targetApi="33">
+        tools:targetApi="34">
+        <activity
+            android:name=".PdfActivity"
+            android:exported="false" />
         <activity
             android:name=".Main_nav"
             android:exported="false"

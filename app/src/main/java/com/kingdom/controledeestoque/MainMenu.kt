@@ -1,7 +1,5 @@
 package com.kingdom.controledeestoque
 
-//
-//import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -13,10 +11,14 @@ import android.provider.AlarmClock
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -35,22 +37,19 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
+class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
     var username = username
-    //lateinit var user: String
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View?
     = inflater.inflate(R.layout.activity_main_menu, container, false).apply {
+
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.appBar)
+        (activity as AppCompatActivity).setSupportActionBar(toolbar)
+        setHasOptionsMenu(true)
+
         var ctxt = getActivity()?.getApplicationContext()
 
-        var relatorio = findViewById<FloatingActionButton>(R.id.relatorio)
-        relatorio.setOnClickListener {
-            var estatistica = Intent(ctxt, Relatorio::class.java)
-            startActivity(estatistica)
-        }
-
-        var coordinator = findViewById<ConstraintLayout>(R.id.parent)
         var cl = findViewById<ConstraintLayout>(R.id.CL)
 
         var progressTB =
@@ -196,10 +195,6 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
         CoroutineScope(Dispatchers.IO).async {
             connectionView()
         }
-
-
-        //var sync = parseInt("")
-
 
         fun postSyncSuccess() {
             Snackbar.make(
@@ -351,8 +346,6 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
                 //whileSync(true)
                 doSync()
             }
-
-
         }
         var intent: Intent
 
@@ -366,13 +359,10 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
             }
         }
 
-        //val username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)
-        val username = username
+        val username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)
+        //val username = username
         var saudacao = "Bem-vindo, ${username}" // 11
         findViewById<TextView>(R.id.saudacao).apply { text = saudacao }
-
-
-
 
         buttonTrArmz.setOnClickListener {
             intent = Intent(ctxt, TransferenciaDeArmazem::class.java)
@@ -381,15 +371,26 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
                 }
             startActivity(intent)
         }
+    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.main_menu, menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.accountView -> {
+                val modalBottomSheet = ModalBottomSheet(username)
+                modalBottomSheet.show(childFragmentManager, ModalBottomSheet.TAG)
+
+                false
 
 
-
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
-
-
-
-    }
+}
 
 class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
     var user = username
@@ -434,7 +435,7 @@ class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
 
         val verCode = pInfo.versionCode //Version Code
 
-        versao.text = "Versão do PCP: ${versionName}"
+        versao.text = "Versão do CE: ${versionName}"
 
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -448,30 +449,3 @@ class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
         const val TAG = "ModalBottomSheet"
     }
 }
-
-
-
-
-
-
-/*class FloatingActionButtonBehavior(context: Context?, attrs: AttributeSet?) :
-    CoordinatorLayout.Behavior<FloatingActionButton?>() {
-    fun layoutDependsOn(
-        parent: CoordinatorLayout?,
-        child: FloatingActionButton?,
-        dependency: View?
-    ): Boolean {
-        return dependency is Snackbar.SnackbarLayout
-    }
-
-    fun onDependentViewChanged(
-        parent: CoordinatorLayout?,
-        child: FloatingActionButton,
-        dependency: View
-    ): Boolean {
-        val translationY =
-            Math.min( dependency.getTranslationY().toFloat(), dependency.getHeight().toFloat())
-        child.translationY = translationY
-        return true
-    }
-}*/

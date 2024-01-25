@@ -2,8 +2,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Theme.ControleDeEstoque" parent="Theme.Material3.Light.NoActionBar">
-
-
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -19,9 +17,6 @@
         <item name="colorContainer">@color/colorSecondary</item>
         <item name="android:textColorHighlight">@color/color_100</item>
 
-
-
-
         <!-- Status bar color. -->
         <!--item name="android:statusBarColor">@color/blue_0</item-->
         <item name="navigationIconTint">@color/spacegray</item>
@@ -34,7 +29,4 @@
         <item name="android:statusBarColor">@color/colorPrimary</item>
 
     </style>
-
-
-
 </resources>

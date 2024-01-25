@@ -18,26 +18,20 @@ class Main_nav : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_nav)
 
-        if (Build.VERSION.SDK_INT >= 21) {
+        /*if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
             getWindow().setNavigationBarColor(ContextCompat.getColor(this,R.color.white));
             var view = getWindow().getDecorView();
             view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
-        }
-
-
-
+        }*/
         //bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
 
         username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE)!!
-        //username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)!!
-
 
         val MainMenu=MainMenu(username)
         val Relatorio=Relatorio()
         val Notificacoes=Notificacoes(username, this)
         val Requisicao=Requisicao(username, this)
-
 
         setCurrentFragment(MainMenu)
 

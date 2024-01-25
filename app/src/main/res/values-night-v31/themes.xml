@@ -3,7 +3,6 @@
 
     <style name="Theme.ControleDeEstoque" parent="Theme.Material3.Dark.NoActionBar">
 
-
         <item name="colorPrimary">@color/material_dynamic_primary40</item>
         <item name="colorPrimaryVariant">@color/material_dynamic_primary80</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -19,19 +18,11 @@
         <item name="colorContainer">@color/material_dynamic_primary70</item>
         <item name="android:textColorHighlight">@color/color_100</item>
 
-
-
-        <!-- Status bar color. -->
-        <!--item name="android:statusBarColor">@color/blue_0</item-->
         <item name="navigationIconTint">@color/spacegray</item>
-        <!-- Transparent system bars for edge-to-edge. -->
-
-        <!--item name="android:navigationBarColor">@android:color/white</item-->
         <item name="android:navigationBarColor">@color/material_dynamic_primary30</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:statusBarColor">@color/material_dynamic_primary30</item>
 
     </style>
-
 </resources>

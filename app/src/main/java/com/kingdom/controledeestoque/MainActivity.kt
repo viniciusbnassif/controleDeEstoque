@@ -38,24 +38,17 @@ class MainActivity : AppCompatActivity() {
         var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
         var ctxt = this
 
-
-
-
         setContentView(R.layout.activity_main)
         SQLiteHelper(this);
         var db = SQLiteHelper(this)
 
         var sync = Sync()
 
-
         val user = findViewById<EditText>(R.id.editTextUsername)
         val userView = findViewById<TextInputLayout>(R.id.viewUser)
 
         val pw = findViewById<EditText>(R.id.editTextPassword)
         val pwView = findViewById<TextInputLayout>(R.id.viewPassword)
-
-
-
 
         fun syncIsDone(){
             val username = user.text.toString()

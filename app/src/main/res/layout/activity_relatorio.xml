@@ -10,14 +10,14 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:backgroundTint="@color/colorPrimary"
-        app:title="Relatório"
-        app:titleTextColor="@color/white"
+        android:background="@color/appBarColor"
+        app:backgroundTint="@color/appBarColor"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Relatório"
+        app:titleTextColor="@color/white">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +34,7 @@
                 android:indeterminate="true"
                 android:indeterminateTint="@color/colorSecondary"
                 android:progressTint="@color/colorSecondary"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/refresh"
                 app:layout_constraintStart_toStartOf="parent"
@@ -44,12 +44,11 @@
                 android:id="@+id/refresh"
                 android:layout_width="65dp"
                 android:layout_height="62dp"
-                android:backgroundTint="@color/colorPrimary"
+                android:backgroundTint="@color/appBarColor"
                 android:src="@drawable/ic_baseline_sync_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/pIndicator"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
