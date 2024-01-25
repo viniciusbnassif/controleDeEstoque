@@ -1,19 +1,14 @@
 package com.kingdom.controledeestoque
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.AlarmClock
 import android.view.View
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class Main_nav : AppCompatActivity() {
 
@@ -61,6 +56,13 @@ class Main_nav : AppCompatActivity() {
 
 
         //updateBadge(this, username)
+    }
+    fun restartFragment() {
+        var mainMenu = Intent(this, Main_nav::class.java).apply {
+            putExtra(AlarmClock.EXTRA_MESSAGE, username)
+        }
+        startActivity(mainMenu)
+        finish()
     }
 
     override fun onDestroy() {

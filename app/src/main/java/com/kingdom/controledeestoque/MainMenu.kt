@@ -3,14 +3,14 @@ package com.kingdom.controledeestoque
 //
 //import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
+import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
 import android.provider.AlarmClock
 import android.provider.Settings
-import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,15 +18,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.kingdom.controledeestoque.database.Sync
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
@@ -279,12 +285,71 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
 
         }
 
+        var customAlertDialogView : View = layoutInflater.inflate(R.layout.alertdialog_sync_running, null)
+        var materialAlertSync =
+            MaterialAlertDialogBuilder(context)
+                .setView(customAlertDialogView)
+                .setTitle("Sincronizando")
+                .setCancelable(false)
+
+        suspend fun doSync() {
+            syncBtn.isEnabled = false
+            var show = materialAlertSync.show()
+            //var data = String
+            // <- extension on current scope
+            Log.d("context inside method from button sync", "${ctxt.toString()}")
+            var data = Sync().sync(0, activity?.applicationContext!!)
+
+
+
+            //val result = data.await()
+            if (data == "Sucesso") {
+                show.cancel()
+                //whileSync(false)
+                /*Snackbar.make(
+                    cl,
+                    "Sincronizado com sucesso!",
+                    Snackbar.LENGTH_SHORT
+                ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
+                    .setActionTextColor(Color.WHITE).setAction("OK") {}.show()*/
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Sincronizando")
+                    .setMessage("Sincronizado com sucesso")
+                    .setCancelable(false)
+                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+
+
+
+
+            } else if (data == "Falha") {
+                show.cancel()
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Falha")
+                    .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                    .setCancelable(false)
+                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+
+                //withContext(Dispatchers.Main) { connectionView() }
+            } else {
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Falha")
+                    .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                    .setCancelable(false)
+                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+
+                show.cancel()
+                /* TO DO */
+            }
+
+        }
+
         syncBtn.setOnClickListener {
-            MainScope().launch {
-                synchronization()
-                /*if (rtn == "Sucesso"){
-                    postSyncSuccess()
-                }*/
+            CoroutineScope(Dispatchers.Main).launch {
+                //whileSync(true)
+                doSync()
             }
 
 
@@ -318,28 +383,78 @@ class MainMenu(username: String?) : Fragment()/*, LifecycleEventObserver*/ {
         }
 
 
-        val buttonAP: Button = findViewById(R.id.apPerdas)
-        buttonAP.setOnClickListener {
-            /*intent = Intent(this, ApontamentoPerdas::class.java)
-                .apply {
-                    putExtra(AlarmClock.EXTRA_MESSAGE, username)}
-            startActivity(intent)*/
+
+    }
+
+
+
+
+    }
+
+class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
+    var user = username
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
+                              savedInstanceState: Bundle?): View?
+            = inflater.inflate(R.layout.bottom_sheet, container, false).apply {
+
+
+        var ctxt = activity?.applicationContext
+
+        var userview = findViewById<TextView>(R.id.textView)
+        var guia = findViewById<MaterialButton>(R.id.btnGuia)
+        var sair = findViewById<MaterialButton>(R.id.btnSair)
+        var versao = findViewById<MaterialButton>(R.id.versionView)
+        userview.text = user
+        guia.setOnClickListener{
+            //val contentUri = FileProvider.getUriForFile(context, "com.liderMinas.PCP", getResources().openRawResource(R.drawable.guia);)
+            var intent = Intent(ctxt, PdfActivity::class.java)
+            startActivity(intent)
+
+        }
+        sair.setOnClickListener {
+            var intent = Intent(ctxt, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            activity?.finish()
         }
 
+        var pInfo: PackageInfo? = null
+        try {
+            pInfo = requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
 
+        val versionName = pInfo!!.versionName //Version Name
+
+        val versionCode = pInfo!!.versionCode //
+
+
+
+        val verCode = pInfo.versionCode //Version Code
+
+        versao.text = "Versão do PCP: ${versionName}"
+
+    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return (super.onCreateDialog(savedInstanceState) as BottomSheetDialog).apply {
+            behavior.setPeekHeight(resources.displayMetrics.heightPixels)
+        }
     }
 
 
-
-
+    companion object {
+        const val TAG = "ModalBottomSheet"
     }
+}
 
 
 
 
 
 
-class FloatingActionButtonBehavior(context: Context?, attrs: AttributeSet?) :
+/*class FloatingActionButtonBehavior(context: Context?, attrs: AttributeSet?) :
     CoordinatorLayout.Behavior<FloatingActionButton?>() {
     fun layoutDependsOn(
         parent: CoordinatorLayout?,
@@ -359,4 +474,4 @@ class FloatingActionButtonBehavior(context: Context?, attrs: AttributeSet?) :
         child.translationY = translationY
         return true
     }
-}
+}*/
