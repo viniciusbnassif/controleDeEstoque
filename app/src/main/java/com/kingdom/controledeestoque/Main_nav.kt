@@ -1,14 +1,16 @@
 package com.kingdom.controledeestoque
 
 import android.content.Intent
-import android.os.Build
+import android.content.res.Configuration
 import android.os.Bundle
 import android.provider.AlarmClock
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigationrail.NavigationRailView
 
 class Main_nav : AppCompatActivity() {
 
@@ -35,6 +37,7 @@ class Main_nav : AppCompatActivity() {
 
         setCurrentFragment(MainMenu)
 
+
         var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         bottomNavigationView.setOnNavigationItemSelectedListener {
             getCount(SQLiteHelper(this).countNotf(username))
@@ -46,11 +49,56 @@ class Main_nav : AppCompatActivity() {
             }
             true
         }
+
+        var navRail = findViewById<NavigationRailView>(R.id.nav_viewRail)
+        navRail.setOnItemSelectedListener {
+            getCount(SQLiteHelper(this).countNotf(username))
+            when(it.itemId){
+                R.id.menu->setCurrentFragment(MainMenu)
+                R.id.relatorioNav->setCurrentFragment(Relatorio)
+                R.id.notificacoes->setCurrentFragment(Notificacoes)
+                R.id.requisicoes->setCurrentFragment(Requisicao)
+            }
+            true
+        }
         getCount(SQLiteHelper(this).countNotf(username))
+
+        var correction = findViewById<View>(R.id.viewCorrection)
+
+        /*var newConfig = Configuration()
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            navRail.visibility = VISIBLE
+            correction.visibility = VISIBLE
+            bottomNavigationView.visibility = GONE
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            navRail.visibility = GONE
+            correction.visibility = GONE
+            bottomNavigationView.visibility = VISIBLE
+        }*/
 
 
         //updateBadge(this, username)
     }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        var navRail = findViewById<NavigationRailView>(R.id.nav_viewRail)
+        var correction = findViewById<View>(R.id.viewCorrection)
+
+
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            navRail.visibility = VISIBLE
+            correction.visibility = VISIBLE
+            bottomNavigationView.visibility = GONE
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            navRail.visibility = GONE
+            correction.visibility = GONE
+            bottomNavigationView.visibility = VISIBLE
+        }
+    }
+
     fun restartFragment() {
         var mainMenu = Intent(this, Main_nav::class.java).apply {
             putExtra(AlarmClock.EXTRA_MESSAGE, username)
@@ -77,22 +125,45 @@ class Main_nav : AppCompatActivity() {
     }
     fun updateBadge(count: Int) {
         var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        var navRail = findViewById<NavigationRailView>(R.id.nav_viewRail)
         var badge = bottomNavigationView.getOrCreateBadge(R.id.notificacoes)
+        var badgeRail = navRail.getOrCreateBadge(R.id.notificacoes)
         if (count != 0) {
             badge.isVisible = true
+            badgeRail.isVisible = true
             // An icon only badge will be displayed unless a number or text is set:
             badge.number = count
+            badgeRail.number = count
         } else {
             badge.isVisible = false
+            badgeRail.isVisible = false
         }
     }
 
 
 
-    private fun setCurrentFragment(fragment: Fragment)=
+    private fun setCurrentFragment(fragment: Fragment) {
+        var name = fragment.toString().substring(0, 5)
+        var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        var navRail = findViewById<NavigationRailView>(R.id.nav_viewRail)
+
         supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment_activity_main_nav,fragment)
+            replace(R.id.nav_host_fragment_activity_main_nav, fragment)
             commit()
         }
+        if (name == "MainM"){
+            bottomNavigationView.getMenu().findItem(R.id.menu).setChecked(true)
+            navRail.getMenu().findItem(R.id.menu).setChecked(true)
+        } else if (name == "Relat"){
+            bottomNavigationView.getMenu().findItem(R.id.relatorioNav).setChecked(true)
+            navRail.getMenu().findItem(R.id.relatorioNav).setChecked(true)
+        } else if (name == "Notif"){
+            bottomNavigationView.getMenu().findItem(R.id.notificacoes).setChecked(true)
+            navRail.getMenu().findItem(R.id.notificacoes).setChecked(true)
+        } else if (name == "Requi"){
+            bottomNavigationView.getMenu().findItem(R.id.requisicoes).setChecked(true)
+            navRail.getMenu().findItem(R.id.requisicoes).setChecked(true)
+        }
+    }
     public val mainNavContext = this
 }

@@ -2,8 +2,6 @@ package com.kingdom.controledeestoque
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import com.github.barteksc.pdfviewer.PDFView
 import com.google.android.material.appbar.MaterialToolbar
@@ -32,7 +30,7 @@ class PdfActivity : AppCompatActivity() {
         }
 
         var pdfView = findViewById<PDFView>(R.id.pdfView)
-        pdfView.fromAsset("guia.pdf").load()
+        pdfView.fromAsset("guiace.pdf").load()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
