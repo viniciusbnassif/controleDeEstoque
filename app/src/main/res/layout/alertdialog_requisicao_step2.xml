@@ -125,11 +125,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/salvar"
-        style="@style/Widget.Material3.Button.ElevatedButton"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Salvar"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -138,12 +138,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/fechar"
-        style="@style/Widget.Material3.Button.ElevatedButton"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
+        android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="Fechar"
         app:layout_constraintBottom_toBottomOf="parent"
