@@ -3,10 +3,15 @@ package com.kingdom.controledeestoque.database
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import kotlinx.coroutines.*
-import java.net.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
 
 
 class Sync : AppCompatActivity(), LifecycleEventObserver {
@@ -85,6 +90,8 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
                     if (cod == 0 || cod == 1) {
 
                         movimentoToServer(ctxt)
+                        //uploadRequisicoes(ctxt)
+                        uploadUpdRequisicoes(ctxt)
 
                         if (cod == 1) {
                             message = "Sucesso" //Sincronizado com sucesso
@@ -96,6 +103,7 @@ class Sync : AppCompatActivity(), LifecycleEventObserver {
                         getArmz(ctxt)
                         getSaldo(ctxt)
                         getSlLote(ctxt)
+                        downloadRequisicoes(ctxt)
 
                         message = "Sucesso" //Sincronizado com sucesso
                         return@withContext message

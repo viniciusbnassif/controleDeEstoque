@@ -356,10 +356,10 @@ class SQLiteHelper(context: Context?):
     }
     fun getDescProdutosEst(idPrd: String): Cursor? {
         var cursor = db.query(
-            TBL_PROD_EST,
-            arrayOf("$ID_PROD_EST AS ${BaseColumns._ID}",
-                DESC_PROD_EST,
-                COD_PROD_EST
+            TBL_PRODUTO,
+            arrayOf("$ID_PRODUTO AS ${BaseColumns._ID}",
+                DESC_PROD,
+                COD_PROD
             ),
             "codProduto = '$idPrd'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
@@ -411,7 +411,7 @@ class SQLiteHelper(context: Context?):
                 DATA_CONF,
                 STATUS_SYNC
             ),
-            USER_CONF + " IS NULL" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            USER_ATEND + " IS NULL" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
             null /* GROUP BY clause, null if no GROUP BY clause */,
             null /* HAVING CLAUSE, null if no HAVING clause */,

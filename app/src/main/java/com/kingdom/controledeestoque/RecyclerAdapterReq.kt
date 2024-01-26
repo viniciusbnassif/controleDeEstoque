@@ -6,7 +6,6 @@ import android.icu.text.SimpleDateFormat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.TextView
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.lang.Float.parseFloat
 import java.util.Date
@@ -101,7 +99,8 @@ public class RecyclerAdapterReq(cursorE: Cursor?, context: Context): RecyclerVie
             if (userAtend !=null) {
                 holder.userAtend.text = "Respondido por: ${userAtend?.toString() ?: ""}"
             } else {
-                holder.userAtend.text = "Respondido por: Aguardando resposta"
+                holder.userAtend.
+                text = "Respondido por: Aguardando resposta"
             }
             //holder.userAtend.text = "Respondido por: ${userAtend?.toString() ?: ""}"//if (userAtend) {userAtend.toString()} else {""}
             holder.dty.text = dateFormatted
@@ -170,7 +169,6 @@ public class RecyclerAdapterReq(cursorE: Cursor?, context: Context): RecyclerVie
                 qtd?.setText("${holder.qtdAtend.hint}")
 
                 var txt = "null"
-                if ((qtdAtend == null) || qtdAtend == 0.0f /*|| holder.qtdAtend.hint == "null" || holder.qtdAtend.hint == null*/) {
                     var soma1 =
                         dialogBuilder.findViewById<MaterialButton>(R.id.soma1)?.setOnClickListener {
                             var qtdS = parseFloat(qtd?.text.toString())
@@ -183,27 +181,7 @@ public class RecyclerAdapterReq(cursorE: Cursor?, context: Context): RecyclerVie
                             qtdS -= 1
                             qtd?.setText("$qtdS")
                         }
-                    dialogBuilder.findViewById<TextView>(R.id.nomePasso)?.setText("Aguarde pelo envio da resposta antes de continuar.")
-                    //dialogBuilder.setMessage("Aguarde pelo envio da resposta antes de continuar.")
-                    dialogBuilder.findViewById<MaterialButton>(R.id.subt1)?.visibility = GONE
-                    dialogBuilder.findViewById<MaterialButton>(R.id.soma1)?.visibility = GONE
-                    dialogBuilder.findViewById<TextInputEditText>(R.id.qtd)?.visibility = GONE
-                    dialogBuilder.findViewById<TextInputLayout>(R.id.qtdView)?.visibility = GONE
-                    dialogBuilder.findViewById<MaterialButton>(R.id.salvar)?.visibility = GONE
-                } else {
-                    var soma1 =
-                        dialogBuilder.findViewById<MaterialButton>(R.id.soma1)?.setOnClickListener {
-                            var qtdS = parseFloat(qtd?.text.toString())
-                            qtdS += 1
-                            qtd?.setText("$qtdS")
-                        }
-                    var subt1 =
-                        dialogBuilder.findViewById<MaterialButton>(R.id.subt1)?.setOnClickListener {
-                            var qtdS = parseFloat(qtd?.text.toString())
-                            qtdS -= 1
-                            qtd?.setText("$qtdS")
-                        }
-                    dialogBuilder.findViewById<TextView>(R.id.nomePasso)?.setText("Digite a quantidade recebida e clique em Salvar")
+                    dialogBuilder.findViewById<TextView>(R.id.nomePasso)?.setText("Digite a quantidade que será enviada e clique em Salvar")
                     dialogBuilder.findViewById<MaterialButton>(R.id.subt1)?.visibility = VISIBLE
                     dialogBuilder.findViewById<MaterialButton>(R.id.soma1)?.visibility = VISIBLE
                     dialogBuilder.findViewById<TextInputEditText>(R.id.qtd)?.visibility = VISIBLE
@@ -211,7 +189,7 @@ public class RecyclerAdapterReq(cursorE: Cursor?, context: Context): RecyclerVie
                     dialogBuilder.findViewById<MaterialButton>(R.id.salvar)?.setOnClickListener {
                         var query = """
                                 UPDATE Requisicao
-                                SET qtdConfirmacao = ${parseFloat(qtd?.text.toString())}, userConfirmacao = '${userReq.toString()}', dataHoraConfirmacao = '${date()}', statusSync = 2
+                                SET qtdAtendida = ${parseFloat(qtd?.text.toString())}, userAtendimento = '${userReq.toString()}', dataHoraAtendimento = '${date()}', statusSync = 2
                                 WHERE idRequisicao = ${holder.id.text} AND qtdRequisicao = ${qtdReq.toString()} AND userRequisicao = '${userReq.toString()}';
                             """.trimIndent()
                         db.externalExecSQL(query)
@@ -229,7 +207,7 @@ public class RecyclerAdapterReq(cursorE: Cursor?, context: Context): RecyclerVie
                         holder.card.setCardBackgroundColor(ContextCompat.getColor(ctxt, R.color.suErrorRed))
                     }
 
-                }
+
 
             }
 
