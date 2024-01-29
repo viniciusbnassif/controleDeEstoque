@@ -17,4 +17,5 @@
     <color name="textColorSecondary">#DCDCDC</color>
     <color name="textColorTertiary">#898989</color>
     <color name="containerBackground">#001E2C</color>
+    <color name="unreadBackgroundColor">#214A66</color>
 </resources>

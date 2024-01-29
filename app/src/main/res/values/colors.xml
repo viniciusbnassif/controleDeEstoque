@@ -21,4 +21,5 @@
     <color name="textColorSecondary">#232323</color>
     <color name="textColorTertiary">#545454</color>
     <color name="containerBackground">#E0F3FF</color>
+    <color name="unreadBackgroundColor">#E1F3FF</color>
 </resources>

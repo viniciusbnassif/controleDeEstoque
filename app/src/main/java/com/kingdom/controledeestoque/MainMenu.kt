@@ -17,6 +17,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -27,7 +28,9 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +38,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Boolean.TRUE
 
 
 class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
@@ -287,58 +291,69 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                 .setTitle("Sincronizando")
                 .setCancelable(false)
 
+        customAlertDialogView.findViewById<LinearProgressIndicator>(R.id.progressBar).setActivated(TRUE)
+
         suspend fun doSync() {
             syncBtn.isEnabled = false
             var show = materialAlertSync.show()
             //var data = String
             // <- extension on current scope
             Log.d("context inside method from button sync", "${ctxt.toString()}")
-            var data = Sync().sync(0, activity?.applicationContext!!)
+            CoroutineScope(Dispatchers.IO).run {
+                var data = Sync().sync(0, activity?.applicationContext!!)
 
 
-
-            //val result = data.await()
-            if (data == "Sucesso") {
-                show.cancel()
-                //whileSync(false)
-                /*Snackbar.make(
+                //val result = data.await()
+                if (data == "Sucesso") {
+                    MainScope().launch {
+                        show.cancel()
+                        //whileSync(false)
+                        /*Snackbar.make(
                     cl,
                     "Sincronizado com sucesso!",
                     Snackbar.LENGTH_SHORT
                 ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
                     .setActionTextColor(Color.WHITE).setAction("OK") {}.show()*/
-                MaterialAlertDialogBuilder(context)
-                    .setTitle("Sincronizando")
-                    .setMessage("Sincronizado com sucesso")
-                    .setCancelable(false)
-                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+                        MaterialAlertDialogBuilder(context)
+                            .setTitle("Sincronizando")
+                            .setMessage("Sincronizado com sucesso")
+                            .setCancelable(false)
+                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
+                            .show()
+                    }
 
 
+                } else if (data == "Falha") {
 
+                    MainScope().launch {
+                        show.cancel()
+                        MaterialAlertDialogBuilder(context)
+                            .setTitle("Falha")
+                            .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                            .setCancelable(false)
+                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
+                            .show()
+                    }
 
-            } else if (data == "Falha") {
-                show.cancel()
-                MaterialAlertDialogBuilder(context)
-                    .setTitle("Falha")
-                    .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
-                    .setCancelable(false)
-                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+                    //withContext(Dispatchers.Main) { connectionView() }
+                } else {
+                    MainScope().launch {
+                        MaterialAlertDialogBuilder(context)
+                            .setTitle("Falha")
+                            .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                            .setCancelable(false)
+                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
+                            .show()
 
-                //withContext(Dispatchers.Main) { connectionView() }
-            } else {
-                MaterialAlertDialogBuilder(context)
-                    .setTitle("Falha")
-                    .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
-                    .setCancelable(false)
-                    //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                    .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }.show()
+                        show.cancel()
+                    }
+                    /* TO DO */
+                }
 
-                show.cancel()
-                /* TO DO */
             }
-
         }
 
         syncBtn.setOnClickListener {
