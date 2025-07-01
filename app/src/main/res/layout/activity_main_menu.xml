@@ -1,165 +1,265 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/parent"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context=".MainMenu">
 
-    <!--com.google.android.material.appbar.MaterialToolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="top"
-        android:background="@color/colorPrimary"
-        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_scrollFlags="scroll|enterAlways"
-        app:navigationIconTint="@color/white"
-        app:title="Menu principal"
-        app:titleTextColor="@color/white"/-->
+        app:navigationIconTint="@color/textColorTertiary"
+        app:icon="@color/white"
+        app:title="Menu inicial"
+        app:titleTextColor="@color/textColorTertiary">
+    </com.google.android.material.appbar.MaterialToolbar>
 
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_behavior="com.example.FloatingActionButtonBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fragment_container"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/appBar">
 
-        <!-- Note: A RecyclerView can also be used -->
-        <com.google.android.material.appbar.AppBarLayout
+        <RelativeLayout
+            android:id="@+id/main_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/appBar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/appBarColor"
-                app:menu="@menu/main_menu"
-                app:navigationIconTint="@color/white"
-                app:title="Menu inicial"
-                app:titleTextColor="@color/white">
-
-            </com.google.android.material.appbar.MaterialToolbar>
-
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/progressToolbar"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:indeterminate="true"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true">
 
-                android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/no_connection_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/no_connection_text"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/rounded_link_off_24"
+                    app:tint="@color/colorOnPrimaryContainer"
+                    android:visibility="visible" />
+                <TextView
+                    android:id="@+id/no_connection_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sem conexão com a internet"
+                    android:layout_gravity="center"
+                    android:visibility="visible" />
+            </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/refreshConnection"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                app:icon="@drawable/rounded_refresh_24" />
 
-        </com.google.android.material.appbar.AppBarLayout>
-
+        </RelativeLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/CL"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="0px"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/saudacaoContainer"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/ApontamentosTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                android:visibility="gone"
+                android:layout_marginBottom="8dp"
+                android:text="Transferências"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/trArmz"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/saudacao"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Bem-vindo"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/sair"
-                    style="@style/Widget.Material3.Button.ElevatedButton.Icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Finalizar \nSessão"
-                    app:icon="@drawable/baseline_login_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/trArmz"
                 style="@style/Widget.Material3.Button.ElevatedButton.Icon"
                 android:layout_width="0dp"
                 android:layout_height="108dp"
-                android:layout_marginStart="64dp"
-                android:layout_marginEnd="64dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/button_gradient"
+                app:backgroundTint="@null"
+                android:iconTint="@color/colorOnPrimaryContainer"
                 android:text="Transferência de armazem"
-                android:textSize="20sp"
-                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                android:textColor="@color/colorOnPrimaryContainer"
+                android:textSize="18sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/rounded_compare_arrows_24"
+                app:iconGravity="textStart"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/saudacaoContainer" />
+                app:layout_constraintTop_toBottomOf="@+id/ApontamentosTextView" />
 
-            <Button
-                android:id="@+id/apPerdas"
-                style="@style/ThemeOverlay.Material3.Button.ElevatedButton"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_marginStart="64dp"
-                android:layout_marginEnd="64dp"
-                android:text="Apontar perdas de produtos"
-                android:textSize="20sp"
-                android:visibility="gone"
-                app:cornerRadius="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/materialDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/trArmz" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/linearLayout"
+            <TextView
+                android:id="@+id/OutrosTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_marginTop="4dp"
+                android:text="Outras funções"
+                android:textColor="@color/colorSecondary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/materialDivider" />
 
-                <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                    android:id="@+id/syncBtn"
-                    style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="15dp"
-                    android:text="Sincronizar"
-                    app:icon="@drawable/ic_baseline_sync_24"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/relatorio"
+                android:layout_width="0dp"
+                android:layout_height="108dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="2dp"
+                android:backgroundTint="@color/colorSecondaryContainer"
+                android:text="Relatório"
+                android:textColor="@color/colorOnSecondaryContainer"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/rounded_summarize_24"
+                app:iconGravity="textTop"
+                app:iconTint="@color/colorOnSecondaryContainer"
+                app:layout_constraintEnd_toStartOf="@+id/notificacoes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/OutrosTextView" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/notificacoes"
+                android:layout_width="0dp"
+                android:layout_height="108dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="2dp"
+                android:backgroundTint="@color/colorSecondaryContainer"
+                android:text="Notificações"
+                android:textColor="@color/colorOnSecondaryContainer"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/rounded_notifications_24"
+                app:iconGravity="textTop"
+                app:iconTint="@color/colorOnSecondaryContainer"
+                app:layout_constraintEnd_toStartOf="@+id/syncBtn"
+                app:layout_constraintStart_toEndOf="@+id/relatorio"
+                app:layout_constraintTop_toBottomOf="@id/OutrosTextView" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/syncBtn"
+                android:layout_width="0dp"
+                android:layout_height="108dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="2dp"
+                android:backgroundTint="@color/colorSecondaryContainer"
+                android:text="Sincronizar"
+                android:textColor="@color/colorOnSecondaryContainer"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/rounded_sync_24"
+                app:iconGravity="textTop"
+                app:iconTint="@color/colorOnSecondaryContainer"
+                app:layout_constraintEnd_toStartOf="@+id/accountBtn"
+                app:layout_constraintStart_toEndOf="@+id/notificacoes"
+                app:layout_constraintTop_toBottomOf="@id/OutrosTextView" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/accountBtn"
+                android:layout_width="0dp"
+                android:layout_height="108dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/colorSecondaryContainer"
+                android:text="Mais opções"
+                android:textColor="@color/colorOnSecondaryContainer"
+                android:textSize="14sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/rounded_more_horiz_24"
+                app:iconGravity="textTop"
+                app:iconTint="@color/colorOnSecondaryContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/syncBtn"
+                app:layout_constraintTop_toBottomOf="@id/OutrosTextView" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!--LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/syncBtn"
+                style="@style/Widget.Material3.Button.ElevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="15dp"
+                android:text="Sincronizar"
+                android:textSize="16sp"
+                app:backgroundTint="@color/colorSecondaryContainer"
+                android:textColor="@color/colorOnSecondaryContainer"
+                app:iconTint="@color/colorOnSecondaryContainer"
+                app:icon="@drawable/ic_baseline_sync_24"
+                app:iconGravity="textStart"
+                app:iconSize="22dp" />
+        </LinearLayout-->
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="350dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

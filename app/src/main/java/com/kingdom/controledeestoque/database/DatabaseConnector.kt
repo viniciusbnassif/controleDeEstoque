@@ -8,10 +8,6 @@ import android.util.Log
 import androidx.core.database.getFloatOrNull
 import androidx.core.database.getStringOrNull
 import com.kingdom.controledeestoque.SQLiteHelper
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -30,6 +26,7 @@ class Connection(private val coreConnection: java.sql.Connection) :
 
     var ip = "192.168.1.10:1433" //local server running MSSQL Server [Porta 1433]
     var dbExt = "APP_CE"
+    //var dbExt = "APP_CE_TESTE"
     var username = "APP_CE"
     var password = "app@ce"
     val Classes = "net.sourceforge.jtds.jdbc.Driver"
@@ -77,9 +74,9 @@ fun connect(): java.sql.Connection? {
 
     //val c: Connection
 
+    Log.d("Conectado ao banco de dados", "$dbExt")
 
-    val policy = Builder().permitAll().build()
-    StrictMode.setThreadPolicy(policy)
+
     Class.forName(Classes)
     lateinit var c : Connection
     try {
@@ -121,10 +118,14 @@ fun getProdutoExt(context: Context?) {
         dbIntrn.externalExecSQL("DELETE FROM Produto")
         while (resultSet1.next()){
 
-            var query = "INSERT INTO Produto (idProduto, codProduto, descProduto, tipoProduto, unidMedida, rastro) " +
+            /*var query = "INSERT INTO Produto (idProduto, codProduto, descProduto, tipoProduto, unidMedida, rastro) " +
                     "VALUES (${resultSet1.getInt("idProduto")}, '${resultSet1.getString("codProduto")}', '${resultSet1.getString("descProduto")}', " +
                     "'${resultSet1.getString("tipoProduto")}', '${resultSet1.getString("unidMedida")}', '${resultSet1.getString("rastro")}')"
-            dbIntrn.externalExecSQL(query)
+            dbIntrn.externalExecSQL(query)*/
+
+            dbIntrn.insertProduto(resultSet1.getInt("idProduto"), resultSet1.getString("codProduto"), resultSet1.getString("descProduto"),
+                resultSet1.getString("tipoProduto"), resultSet1.getString("unidMedida"), resultSet1.getString("rastro"))
+
             Log.d("SQL Insert", "${resultSet1.getString("descProduto")} inserido com sucesso (${resultSet1.getInt("idProduto")})")
         }
 
@@ -160,9 +161,12 @@ fun getArmz(context: Context?) {
         dbIntrn.externalExecSQL("DELETE FROM $tbl")
         while (resultSet1.next()){
             count += 1
-            var query = "INSERT INTO $tbl ($id, $cod, $desc) " +
+            /*var query = "INSERT INTO $tbl ($id, $cod, $desc) " +
                     "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$cod")}', '${resultSet1.getString("$desc")}') "
-            dbIntrn.externalExecSQL(query)
+            dbIntrn.externalExecSQL(query)*/
+
+            dbIntrn.insertArmz(resultSet1.getInt("$id"),resultSet1.getString("$cod"),resultSet1.getString("$desc"))
+
             Log.d("SQL Insert Armz", "${resultSet1.getString("$desc")} inserido com sucesso (${resultSet1.getInt("$id")})")
         }
 
@@ -211,7 +215,7 @@ fun getArmzTest(context: Context?) {
     }
 }
 
-fun getSaldo(context: Context?) {
+fun getDBSRVSaldo(context: Context?) {
 
     val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
     StrictMode.setThreadPolicy(policy)
@@ -237,10 +241,13 @@ fun getSaldo(context: Context?) {
         dbIntrn.externalExecSQL("DELETE FROM $tbl")
         while (resultSet1.next()){
             count += 1
-            var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $saldo) " +
+            /*var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $saldo) " +
                     "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$codP")}', '${resultSet1.getString("$codArmz")}'," +
                     "'${resultSet1.getFloat("$saldo")}') "
-            dbIntrn.externalExecSQL(query)
+            dbIntrn.externalExecSQL(query)*/
+
+            dbIntrn.insertSaldo(resultSet1.getInt("$id"), resultSet1.getString("$codP"), resultSet1.getString("$codArmz"), resultSet1.getFloat("$saldo"))
+
             Log.d("SQL Insert Saldo", "${resultSet1.getString("$codArmz")} inserido com sucesso (${resultSet1.getInt("$id")})")
         }
 
@@ -251,7 +258,7 @@ fun getSaldo(context: Context?) {
     }
 }
 
-fun getSlLote(context: Context?) {
+fun getDBSRVSlLote(context: Context?) {
 
     val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
     StrictMode.setThreadPolicy(policy)
@@ -279,10 +286,14 @@ fun getSlLote(context: Context?) {
         dbIntrn.externalExecSQL("DELETE FROM $tbl")
         while (resultSet1.next()){
             count += 1
-            var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $lote, $vldLote, $saldo) " +
+            /*var query = "INSERT INTO $tbl ($id, $codP, $codArmz, $lote, $vldLote, $saldo) " +
                     "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$codP")}', '${resultSet1.getString("$codArmz")}'," +
                     "'${resultSet1.getString("$lote")}','${resultSet1.getString("$vldLote")}','${resultSet1.getFloat("$saldo")}') "
-            dbIntrn.externalExecSQL(query)
+            dbIntrn.externalExecSQL(query)*/
+
+            dbIntrn.insertSaldoLote(resultSet1.getInt("$id"), resultSet1.getString("$codP"), resultSet1.getString("$codArmz"),
+                resultSet1.getString("$lote"),resultSet1.getString("$vldLote"),resultSet1.getFloat("$saldo"))
+
             Log.d("SQL Insert SlLote", "${resultSet1.getString("$lote")} inserido com sucesso (${resultSet1.getInt("$id")})")
         }
 
@@ -293,10 +304,7 @@ fun getSlLote(context: Context?) {
     }
 }
 
-fun getNotificacao(context: Context?) {
-
-    val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-    StrictMode.setThreadPolicy(policy)
+fun getDBSRVNotificacao(context: Context?) {
 
     var count = 0
 
@@ -309,15 +317,32 @@ fun getNotificacao(context: Context?) {
     val lido = "lido"
 
     val dbIntrn: SQLiteHelper = SQLiteHelper(context)
+
+    var lastID = dbIntrn.getLastNotificationId()
+
     connect().use {
         val st1 = it?.createStatement()!!
-        val resultSet1 = st1.executeQuery(
-            """
+
+        val resultSet1: ResultSet
+        if (lastID == null) {
+
+            resultSet1 = st1.executeQuery(
+                """
             SELECT *
               FROM $tbl
              ORDER BY $id
             """.trimIndent()
-        )
+            )
+        } else {
+            resultSet1 = st1.executeQuery(
+                """
+             SELECT * 
+             FROM $tbl 
+             WHERE $id > $lastID 
+             ORDER BY $id
+            """.trimIndent()
+            )
+        }
 
         var array = dbIntrn.arrayIdNotf()
         //dbIntrn.externalExecSQL("DELETE FROM $tbl")
@@ -325,19 +350,14 @@ fun getNotificacao(context: Context?) {
 
             if (array != null) {
                 if (!array.contains(resultSet1.getInt("$id"))){
-                    var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
-                            "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
-                            "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
-                    dbIntrn.externalExecSQL(query)
-                    Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
-
+                    dbIntrn.insertNotificacao(resultSet1.getInt("$id"), resultSet1.getString("$msg"), resultSet1.getString("$data"),
+                        resultSet1.getString("$dados"), resultSet1.getString("$user"), resultSet1.getString("$lido"))
+                    Log.d("SQL Download Notificacao", "${resultSet1.getString("$msg")} inserido (${resultSet1.getInt("$id")})")
                 }
             } else {
-                var query = "INSERT INTO $tbl ($id, $msg, $data, $dados, $user, $lido) " +
-                        "VALUES (${resultSet1.getInt("$id")}, '${resultSet1.getString("$msg")}', '${resultSet1.getString("$data")}'," +
-                        "'${resultSet1.getString("$dados")}','${resultSet1.getString("$user")}','${resultSet1.getString("$lido")}') "
-                dbIntrn.externalExecSQL(query)
-                Log.d("SQL Insert Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
+                dbIntrn.insertNotificacao(resultSet1.getInt("$id"), resultSet1.getString("$msg"), resultSet1.getString("$data"),
+                    resultSet1.getString("$dados"), resultSet1.getString("$user"), resultSet1.getString("$lido"))
+                Log.d("SQL Download Notificacao", "${resultSet1.getString("$msg")} inserido com sucesso (${resultSet1.getInt("$id")})")
             }
         }
         //dbIntrn.close()
@@ -349,7 +369,7 @@ fun getNotificacao(context: Context?) {
     connect()?.close()
 }
 
-fun movimentoToServer(context: Context) {
+fun sendDBSRVMovimento(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
     var result = dbIntrn.getInternalMovimento()
     var localResult = result
@@ -362,14 +382,13 @@ fun movimentoToServer(context: Context) {
             do {
                 var id = localResult.getInt(0)
 
-                //var produto = dbIntrn.getDescProdutos(localResult.getInt(9))
-                //var produtoDesc = produto!!.getString(1)
-                //Log.d("ProdDesc", "$produtoDesc")
                 try {
 
                     var insert = (
                         """
-                        INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, dataHora, username) VALUES ('${localResult.getString(1)}', '${localResult.getString(2)}', '${localResult.getString(3)}', 
+                        INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, 
+                        armazemDestino, dataHora, username) VALUES ('${localResult.getString(1)}', 
+                        '${localResult.getString(2)}', '${localResult.getString(3)}', 
                                     ${localResult.getFloat(4)}, '${localResult.getString(5)}', '${localResult.getString(6)}', '${localResult.getString(7)}')
                         """.trimIndent())
                     Log.d("Debugggggg", insert)
@@ -377,7 +396,9 @@ fun movimentoToServer(context: Context) {
                     var comm = st1.connection.prepareStatement(insert)
                     comm.executeUpdate()
                     //comm.connection.commit()
-                    dbIntrn.insertDone("Movimento", id)
+
+                    dbIntrn.updateMovimento(id, 1)
+                    //dbIntrn.insertDone("Movimento", id)
 
                 } catch (e: ClassNotFoundException){
                     Log.e("Error SQL CNFE", e.toString())
@@ -403,7 +424,7 @@ fun movimentoToServer(context: Context) {
     }
 }
 
-fun notificationRead(context: Context) {
+fun sendDBSRVNotification(context: Context) {
     var dbIntrn = SQLiteHelper(context)
 
     var result = dbIntrn.getNotificationRead()
@@ -421,7 +442,9 @@ fun notificationRead(context: Context) {
                         """
                         UPDATE Notificacao SET lido = 'S' WHERE idNotificacao = ${localResult.getInt(0)}
                         """.trimIndent())
-                    Log.d("Update notification as read", insert)
+                    //Log.d("Update notification as read", insert)
+
+                    dbIntrn.updateNotificacaoFinal(localResult.getInt(0),1)
 
                     var comm = st1.connection.prepareStatement(insert)
                     comm.executeUpdate()
@@ -445,65 +468,6 @@ fun notificationRead(context: Context) {
     }
     connect()?.close()
 }
-
-/*fun queryExternalServerAP(context: Context) {
-    var dbIntrn: SQLiteHelper = SQLiteHelper(context)
-
-    var result = dbIntrn.getAP()
-    var localResult = result
-
-
-    connect().use {
-
-        var st1 = it?.createStatement()!!
-        if (localResult != null && localResult.getCount() > 0) {
-            localResult.moveToFirst()
-            do {
-
-                var id = localResult?.getInt(0)
-
-                var produto = dbIntrn.getDescProdutos(localResult.getInt(5))
-                var motivo = dbIntrn.getDescMotivo(localResult.getInt(6))
-                var produtoDesc = produto!!.getString(1)
-                var motivoDesc = motivo!!.getString(1)
-                Log.d("ProdDesc", "$produtoDesc")
-                try {
-
-                    var insert = (
-                            """
-                            INSERT INTO ApontPerda 
-                            (qtdPerda, unidPerda, dataHoraPerda, username, produto, motivo)
-                            VALUES
-                            (${localResult.getFloat(1)}, '${localResult.getString(2)}', '${localResult.getString(3)}', '${localResult.getString(4)}',
-                             '${produtoDesc}', '${motivoDesc}');
-                            """.trimIndent())
-                    Log.d("Debugggggg", insert)
-
-                    var comm = st1.connection.prepareStatement(insert)
-                    comm.executeUpdate()
-
-
-                    //comm.connection.commit()
-                } catch (e: ClassNotFoundException){
-                    Log.e("Error SQL CNFE", e.toString())
-                }
-                catch (se: SQLException){
-                    Log.e("Error SQLE", se.toString())
-                }
-                dbIntrn.insertDone("ApontPerda", id)
-
-                //result.moveToNext()
-            }while (localResult.moveToNext())
-
-
-        } else {
-            Log.d("Debug", "Erro ;-;")
-
-        }
-        st1.close()
-        connect()?.close()
-    }
-}*/
 
 fun uploadRequisicoes(context: Context) {
     var dbIntrn: SQLiteHelper = SQLiteHelper(context)
@@ -792,9 +756,6 @@ fun confirmUnPw(username: String, password: String): Int {
     val policy = Builder().permitAll().build()
     StrictMode.setThreadPolicy(policy)
 
-
-
-
     val client = OkHttpClient()
 
 // Create a RequestBody object with your data
@@ -813,7 +774,6 @@ fun confirmUnPw(username: String, password: String): Int {
 // Execute the request and get a Response object
 
     var rtn: Int
-
 
     val host = "192.168.1.11"
     val port = 8080
@@ -839,12 +799,28 @@ fun confirmUnPw(username: String, password: String): Int {
 
 // Check if the response was successful and print the body
     if (response.isSuccessful) {
+        var message = "${response.body()}"
+        rtn = response.code()
         Log.d("Debug UserConnection", "${response.body()?.string()}")
+        Log.d("Debug UserConnection", "${response.code()}")
+
+
         //var body = response.body()?.string()
         //var token = JSONObject(body).getJSONObject("access_token")
         //rtn = if (token.length()>0) 1 else 0
-        rtn = response.code()
+
+
+
+        if (rtn == 202) {
+            if (message != "" && message != null) {
+                    return 202 //código que informa erro e que é obrigatório troca de senha
+
+            }
+        }
+
         return rtn
+
+
     } else {
         println("Request failed: ${response.code()}")
         Log.d("Request failed", "Request failed: ${response.code()}")
@@ -852,6 +828,7 @@ fun confirmUnPw(username: String, password: String): Int {
         return rtn
     }
 }
+
 
 
 

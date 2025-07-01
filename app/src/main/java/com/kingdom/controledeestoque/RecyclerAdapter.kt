@@ -1,13 +1,8 @@
 package com.kingdom.controledeestoque
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
-import android.graphics.Color
 import android.graphics.Color.WHITE
-import android.graphics.Color.parseColor
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +11,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.internal.ContextUtils.getActivity
-import com.kingdom.controledeestoque.database.getNotificacao
 
 public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     var cursor = cursorE
@@ -69,9 +62,14 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
             }
 
             holder.card.setOnClickListener{
-                SQLiteHelper(ctxt).setNotificationRead(id)
-                holder.read.visibility = View.INVISIBLE
-                holder.card.setCardBackgroundColor(WHITE)
+
+                if (holder.read.visibility == View.VISIBLE){
+                    SQLiteHelper(ctxt).setNotificationRead(id)
+
+                    holder.read.visibility = View.INVISIBLE
+                    holder.card.setCardBackgroundColor(getColor(ctxt, R.color.containerBackground))
+                }
+
                 MaterialAlertDialogBuilder(ctxt)
                     .setTitle("Mensagem detalhada")
                     .setMessage(msg)
@@ -82,7 +80,7 @@ public class RecyclerAdapter(cursorE: Cursor?, context: Context): RecyclerView.A
 
                 if (user != null) {
 
-                    Notificacoes(user, ctxt).updateBadge()
+                    //Notificacoes(user, ctxt).updateBadge()
                 }
             }
             //cursor!!.moveToNext()

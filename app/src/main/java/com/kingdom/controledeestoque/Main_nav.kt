@@ -13,8 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigationrail.NavigationRailView
 
 class Main_nav : AppCompatActivity() {
-
-
     lateinit var username : String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,22 +28,24 @@ class Main_nav : AppCompatActivity() {
 
         username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE)!!
 
-        val MainMenu=MainMenu(username)
+        //val MainMenu=MainMenu(username)
         val Relatorio=Relatorio()
-        val Notificacoes=Notificacoes(username, this)
+        val Notificacoes=Notificacoes()
         val Requisicao=Requisicao(username, this)
 
-        setCurrentFragment(MainMenu)
+        /*setCurrentFragment(
+            MainMenu
+        )*/
 
 
         var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         bottomNavigationView.setOnNavigationItemSelectedListener {
             getCount(SQLiteHelper(this).countNotf(username))
             when(it.itemId){
-                R.id.menu->setCurrentFragment(MainMenu)
+                /*R.id.menu->setCurrentFragment(MainMenu)
                 R.id.relatorioNav->setCurrentFragment(Relatorio)
                 R.id.notificacoes->setCurrentFragment(Notificacoes)
-                R.id.requisicoes->setCurrentFragment(Requisicao)
+                R.id.requisicoes->setCurrentFragment(Requisicao)*/
             }
             true
         }
@@ -54,10 +54,10 @@ class Main_nav : AppCompatActivity() {
         navRail.setOnItemSelectedListener {
             getCount(SQLiteHelper(this).countNotf(username))
             when(it.itemId){
-                R.id.menu->setCurrentFragment(MainMenu)
+                /*R.id.menu->setCurrentFragment(MainMenu)
                 R.id.relatorioNav->setCurrentFragment(Relatorio)
                 R.id.notificacoes->setCurrentFragment(Notificacoes)
-                R.id.requisicoes->setCurrentFragment(Requisicao)
+                R.id.requisicoes->setCurrentFragment(Requisicao)*/
             }
             true
         }
@@ -81,21 +81,21 @@ class Main_nav : AppCompatActivity() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
+        /*var bottomNavigationView = findViewById<BottomNavigationView>(R.id.nav_view)
         var navRail = findViewById<NavigationRailView>(R.id.nav_viewRail)
-        var correction = findViewById<View>(R.id.viewCorrection)
+        var correction = findViewById<View>(R.id.viewCorrection)*/
 
 
         super.onConfigurationChanged(newConfig)
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            navRail.visibility = VISIBLE
+            /*navRail.visibility = VISIBLE
             correction.visibility = VISIBLE
-            bottomNavigationView.visibility = GONE
+            bottomNavigationView.visibility = GONE*/
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            navRail.visibility = GONE
+            /*navRail.visibility = GONE
             correction.visibility = GONE
-            bottomNavigationView.visibility = VISIBLE
+            bottomNavigationView.visibility = VISIBLE*/
         }
     }
 

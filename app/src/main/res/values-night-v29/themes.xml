@@ -18,11 +18,13 @@
         <item name="colorContainer">@color/colorSecondary</item>
         <item name="android:textColorHighlight">@color/color_100</item>
 
+        <!-- Status bar and Navigation bar color. -->
         <item name="navigationIconTint">@color/spacegray</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
         <item name="android:windowLightNavigationBar">false</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
 
     </style>
 </resources>

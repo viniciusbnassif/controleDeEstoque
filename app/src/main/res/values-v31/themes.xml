@@ -12,17 +12,21 @@
         <item name="colorOnSecondary">@color/white</item>
         <item name="colorOnPrimaryContainer">@color/material_dynamic_primary30</item>
         <item name="colorPrimaryContainer">@color/color_0</item>
-        <item name="colorSecondaryContainer">@color/material_dynamic_primary30</item>
+        <item name="colorSecondaryContainer">@color/material_dynamic_tertiary40</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
         <item name="android:shadowColor">@color/material_dynamic_primary70</item>
         <item name="colorContainer">@color/material_dynamic_primary70</item>
         <item name="android:textColorHighlight">@color/color_100</item>
 
+        <!-- Status bar and Navigation bar color. -->
         <item name="navigationIconTint">@color/spacegray</item>
-        <item name="android:navigationBarColor">@color/material_dynamic_primary30</item>
-        <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@color/material_dynamic_primary30</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/colorBackground</item>
+
+        <item name="android:windowBackground">@color/colorBackground</item>
+
 
     </style>
 </resources>

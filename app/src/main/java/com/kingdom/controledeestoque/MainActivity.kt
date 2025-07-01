@@ -1,109 +1,160 @@
 package com.kingdom.controledeestoque
 
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
-import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
 import android.provider.AlarmClock
+import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.provider.Settings
-import android.view.*
-import android.widget.*
 import android.util.Log
-import android.view.View.*
-import kotlinx.coroutines.*
+import android.view.Menu
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.WindowInsets
+import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.kingdom.controledeestoque.database.Sync
 import com.kingdom.controledeestoque.database.confirmUnPw
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
 import java.lang.Integer.parseInt
-import java.util.*
+import java.util.Calendar
+
 
 class MainActivity : AppCompatActivity() {
-    @SuppressLint("ServiceCast")
+
+    private lateinit var prefs: PreferencesHelper
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //enableEdgeToEdge()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
+        prefs = PreferencesHelper(this)
 
-        var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
+        //var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
         var ctxt = this
 
-        setContentView(R.layout.activity_main)
-        SQLiteHelper(this);
+        //SQLiteHelper(this);
         var db = SQLiteHelper(this)
 
         var sync = Sync()
 
-        val user = findViewById<EditText>(R.id.editTextUsername)
-        val userView = findViewById<TextInputLayout>(R.id.viewUser)
+        val user = findViewById<EditText>(R.id.usernameText)
+        val userView = findViewById<TextInputLayout>(R.id.username)
 
-        val pw = findViewById<EditText>(R.id.editTextPassword)
-        val pwView = findViewById<TextInputLayout>(R.id.viewPassword)
+        val pw = findViewById<EditText>(R.id.passwordText)
+        val pwView = findViewById<TextInputLayout>(R.id.password)
 
         fun syncIsDone(){
             val username = user.text.toString()
 
-            var mainMenu = Intent(this, Main_nav::class.java).apply {
+            prefs.saveData("username", username)
+            prefs.saveBoolean("isLoggedIn", true)
+
+            var mainMenu = Intent(this, MainMenu::class.java).apply {
                 putExtra(AlarmClock.EXTRA_MESSAGE, username)
             }
             startActivity(mainMenu)
-
             finish()
         }
 
+        var ajudaBtn = findViewById<Button>(R.id.ajudaBtn)
 
-        //Exibir número de versão + revisão
+        ajudaBtn.setOnClickListener{
+            var intent = Intent(ctxt, PdfActivity::class.java)
+            startActivity(intent)
 
-
-        var query: String
-
-        //val user = String
-        //val pw = String
-
-        var elementsOnLogin = findViewById<ConstraintLayout>(R.id.elementsOnLogin)
-
-
-
-
-
-        fun showProgress(result: String) {
-            var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
-            if (result == "true") {
-                progress.setVisibility(VISIBLE)
-            } else if (result == "false") {
-                progress.setVisibility(GONE)
-            }
+            /*db.externalExecSQL("DELETE FROM Notificacao WHERE idNotificacao > 699")
+            Log.d("Debug", "deletou")*/
         }
 
 
-
+        fun showProgress(result: String) {
+            var progress = findViewById<LinearProgressIndicator>(R.id.syncStatusIndicator)
+            var userAuthStatus = findViewById<TextView>(R.id.userAuthStatusText)
+            var syncStatus = findViewById<TextView>(R.id.syncStatusText)
+            if (result == "Verificando") {
+                progress.visibility = VISIBLE
+                userAuthStatus.visibility = GONE
+                syncStatus.visibility = VISIBLE
+                syncStatus.text = "Verificando login e senha"
+            } else if (result == "Erro") {
+                progress.visibility = GONE
+                userAuthStatus.visibility = GONE
+                syncStatus.visibility = GONE
+                syncStatus.text = "Atualizando base de dados"
+            } else if (result == "Autenticado") {
+                progress.visibility = VISIBLE
+                userAuthStatus.visibility = VISIBLE
+                syncStatus.visibility = VISIBLE
+                syncStatus.text = "Atualizando base de dados"
+            } else if (result == "Não autenticado") {
+                progress.visibility = GONE
+                userAuthStatus.visibility = GONE
+                syncStatus.visibility = GONE
+                syncStatus.text = "Atualizando base de dados"
+            } else if (result == "Codigo 202") {
+                progress.visibility = GONE
+                userAuthStatus.visibility = GONE
+                syncStatus.visibility = VISIBLE
+                syncStatus.text = "Erro 202. Pode ser necessário atualizar sua senha."
+            }
+        }
 
         suspend fun connectionView(): String {
-
             var result = Sync().testConnection()
 
-            if (result == "Falha") {
-                var xyz = Snackbar.make(
-                    findViewById(R.id.clMA),
-                    getString(R.string.connectionErroResult1),
-                    Snackbar.LENGTH_LONG
-                ).setBackgroundTint(Color.parseColor("#741919"))
-                    .setTextColor(Color.WHITE)
-                    .setActionTextColor(Color.WHITE)
-                    .setAction("OK") {}.show()
-                return result
-            } else if (result == "Sem Conexão") {
-                return result
+            if (result.toString() == "Falha") {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    var xyz = Snackbar.make(
+                        findViewById(R.id.main),
+                        "Erro",
+                        Snackbar.LENGTH_LONG
+                    ).setBackgroundTint(Color.parseColor("#741919"))
+                        .setTextColor(Color.WHITE)
+                        .setActionTextColor(Color.WHITE)
+                        .setAction("OK") {}.show()
+                }
+                return result.toString()
+
+            } else if (result.toString() == "Sem Conexão") {
+                return result.toString()
             } else {
                 return "Sucesso"
             }
@@ -125,34 +176,47 @@ class MainActivity : AppCompatActivity() {
                 //syncIsDone()
             } as String
         }
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView.rootView) { _, insets ->
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            if(imeVisible){
+                ajudaBtn.isVisible = false
+            } else {
+                ajudaBtn.isVisible = true
+            }
+            insets
+        }
 
         suspend fun authUser(ctxt: android.content.Context) {
-            showProgress("true")
+            showProgress("Verificando")
 
-            val user = findViewById<EditText>(R.id.editTextUsername)
-            val userView = findViewById<TextInputLayout>(R.id.viewUser)
+            val user = findViewById<EditText>(R.id.usernameText)
+            val userView = findViewById<TextInputLayout>(R.id.username)
 
-            val pw = findViewById<EditText>(R.id.editTextPassword)
-            val pwView = findViewById<TextInputLayout>(R.id.viewPassword)
+            val pw = findViewById<EditText>(R.id.passwordText)
+            val pwView = findViewById<TextInputLayout>(R.id.password)
 
             var query: String
-            val button: Button = findViewById(R.id.loginscreen_login)
+            val button = findViewById<Button>(R.id.loginBtn)
+
+            user.isEnabled = false
+            pw.isEnabled = false
+            button.isEnabled = false
 
             var db = SQLiteHelper(this)
 
-            var sync = Sync()
-
-            var elementsOnLogin = findViewById<ConstraintLayout>(R.id.elementsOnLogin)
+            var elementsOnLogin = findViewById<ConstraintLayout>(R.id.main)
 
             var result = connectionView()
+
             if (result == "Sucesso") {
-                var validation = confirmUnPw(user.text.toString(), pw.text.toString())
+                var validation = withContext(Dispatchers.IO) {
+                     confirmUnPw(user.text.toString(), pw.text.toString())
+                }
                 if (validation == 201) {
-                    user.isEnabled = false
-                    pw.isEnabled = false
-                    button.isEnabled = false
+                    userView.error = ""
+                    pwView.error = ""
 
-
+                    showProgress("Autenticado")
                     Snackbar.make(
                         elementsOnLogin,
                         "Usuário autenticado. Aguarde.",
@@ -165,51 +229,103 @@ class MainActivity : AppCompatActivity() {
                     db.externalExecSQL(query)
 
                     var username = user.text.toString()
-                    //var progress = findViewById<LinearProgressIndicator>(R.id.progressToolbar)
-                    //progress.visibility = VISIBLE
-                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+                    prefs.saveData("username", username)
+                    prefs.saveBoolean("isLoggedIn", true)
+                    prefs.saveBoolean("isConnected", true)
 
-                    var message = runSync()
+                    var message = Sync().sync(0,this)
 
                     if (message == "Sucesso"){
-                        var mainMenu = Intent(this, Main_nav::class.java).apply {
-                            putExtra(AlarmClock.EXTRA_MESSAGE, username)
-                        }
+                        var mainMenu = Intent(this, MainMenu::class.java)
                         startActivity(mainMenu)
-
                         finish()
                     } else {
                         showProgress("false")
                     }
-
-
-
-
                 } else if (validation == 401) {
-
-                    userView.setError(" ")
-                    pwView.setError("Nome de usuário ou senha incorretos")
+                    user.isEnabled = true
+                    pw.isEnabled = true
+                    button.isEnabled = true
+                    showProgress("Não autenticado")
+                    userView.error = " "
+                    pwView.error = "Nome de usuário ou senha incorretos"
                     pw.setText("")
                     Snackbar.make(
                         elementsOnLogin,
                         "Nome de usuário e/ou senha incorretos",
                         Snackbar.LENGTH_LONG
                     ).show()
+                } else if (validation == 202) {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Mensagem do Protheus")
+                        .setMessage("""
+                            Você precisa trocar sua senha. Use um computador próximo, abra o aplicativo Protheus e altere-a. 
+                            Depois, clique em "Fechar" e tente novamente. 
+                            Se isso não funcionar, contate o TI. 
+                            Código de erro: 202
+                        """.trimIndent() )
+                        .setNegativeButton(
+                            "Fechar"
+                        ) { dialog, which ->
+                        }.show()
+
+                    user.isEnabled = true
+                    pw.isEnabled = true
+                    button.isEnabled = true
+                    showProgress("Codigo 202")
+                    userView.error = " "
+                    pwView.error = "Nome de usuário ou senha incorretos"
+                    pw.setText("")
+
+                    showProgress("false")
+                } else if (validation == 299) {
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Mensagem do Protheus")
+                        .setMessage("Ocorreu um erro ao entrar com seu usuário e senha. Tente novamente, e se não funcionar, entre em contato com o TI.")
+                        .setNegativeButton(
+                            "Fechar"
+                        ) { dialog, which ->
+
+                        }.show()
+                    showProgress("false")
                 }
             }
             if (result == "Falha" || result == "Sem Conexão") {
                 query =
                     "SELECT username FROM Usuario WHERE username = '${user.text}' AND password = '${pw.text}'"
                 var auth = db.externalExecSQLSelect(user.text.toString(), pw.text.toString())
-                //Log.d("Debug", "Cursor = $cursor")
                 if (auth == true) {
-                    val username = user.text.toString()
-                    var mainMenu = Intent(this, Main_nav::class.java).apply {
-                        putExtra(AlarmClock.EXTRA_MESSAGE, username)
-                    }
-                    startActivity(mainMenu)
-                    finish()
+                    MaterialAlertDialogBuilder(this)
+                        .setTitle("Conexão não encontrada")
+                        .setMessage("Não foi possivel conectar ao servidor, mesmo assim é possível trabalhar offline. \nVerifique as configurações de rede assim que possível.")
+                        .setNegativeButton(
+                            "Continuar"
+                        ) { dialog, which ->
+                            val username = user.text.toString()
+                            prefs.saveData("username", username)
+                            prefs.saveBoolean("isLoggedIn", true)
+                            prefs.saveBoolean("isConnected", false)
+
+                            var mainMenu = Intent(this, MainMenu::class.java)
+                            startActivity(mainMenu)
+                            finish()
+                        }
+                        .setNeutralButton("Abrir Configurações de Wi-fi") { dialog, which ->
+
+                            val username = user.text.toString()
+                            prefs.saveData("username", username)
+                            prefs.saveBoolean("isLoggedIn", true)
+                            prefs.saveBoolean("isConnected", false)
+
+                            var mainMenu = Intent(this, MainMenu::class.java)
+                            startActivity(mainMenu)
+                            finish()
+                            startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+
+                        }.show()
+                    showProgress("false")
+
                 } else if (auth == false) {
                     MaterialAlertDialogBuilder(this)
                         .setTitle("Não foi possivel sincronizar")
@@ -221,18 +337,15 @@ class MainActivity : AppCompatActivity() {
                         .setNeutralButton("Abrir Configurações de Wi-fi") { dialog, which ->
                             startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
                         }.show()
-                    /*Snackbar.make(
-                        elementsOnLogin,
-                        "Não foi possivel conectar ao servidor. Verifique as configurações de rede e tente novamente.",
-                        Snackbar.LENGTH_LONG
-                    ).setAction("Abrir Configurações") {
-                        startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
-                    }.show()*/
-                    showProgress("false")
+                    showProgress("Erro")
+                    user.isEnabled = true
+                    pw.isEnabled = true
+                    button.isEnabled = true
                 }
             }
         }
-        val button: Button = findViewById(R.id.loginscreen_login)
+
+        val button: Button = findViewById(R.id.loginBtn)
         button.setOnClickListener {
             showProgress("true")
             var context = this
@@ -252,13 +365,50 @@ class MainActivity : AppCompatActivity() {
         calendar.set(Calendar.MINUTE, parseInt(dmi[1]))
 
         var date = "01/01/2023"//.toLong()
-        //,,,0NotificationManager(this).NotificacaoErro( "produto", "teste","MensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhadaMensagemDetalhada", calendar.getTimeInMillis())
+
+
+        val myEditText = findViewById<TextInputEditText>(R.id.passwordText)
+
+        doSomething(myEditText)
     }
 
-    companion object {
-        const val NOTIFICATION_ID = 101
-        const val CHANNEL_ID = "channelID"
+    private fun doSomething(doneClick: TextInputEditText){
+        val button = findViewById<Button>(R.id.loginBtn)
+
+        doneClick.setOnEditorActionListener(TextView.OnEditorActionListener{ _, actionId, _ ->
+
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                button.performClick()
+
+                // Do something of your interest.
+                // We in this examples created the following Toasts
+                /*if(search.text.toString() == "geeksforgeeks"){
+                    Toast.makeText(applicationContext, "Welcome to GFG", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Invalid Input", Toast.LENGTH_SHORT).show()
+                }
+
+                return@OnEditorActionListener true*/
+            }
+            false
+        })
     }
+
+    private fun setBarsAppearance() {
+        // Alterar a cor das barras (status e navegação)
+        window.statusBarColor = getColor(R.color.colorPrimary) // Cor da barra de status
+        window.navigationBarColor = getColor(R.color.colorPrimary) // Cor da barra de navegação
+
+        // Configurar ícones (claro ou escuro) com WindowInsetsControllerCompat
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+
+        // Verifica tema atual e configura os ícones
+        val isLightTheme = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_NO
+        controller.isAppearanceLightStatusBars = isLightTheme
+        controller.isAppearanceLightNavigationBars = isLightTheme
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -270,36 +420,8 @@ class MainActivity : AppCompatActivity() {
         SQLiteHelper(this).close()
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_actv, menu)
         return true
     }
-
-
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-
-        R.id.versionView -> {
-            // User chose the "Settings" item, show the app settings UI...
-
-
-            true
-        }
-
-        R.id.closeApp -> {
-            finish()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
-
-
-
 }

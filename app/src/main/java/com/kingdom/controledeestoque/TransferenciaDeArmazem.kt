@@ -1,5 +1,7 @@
 package com.kingdom.controledeestoque
 
+import android.content.Intent
+import android.content.res.Configuration
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.os.Looper
@@ -7,6 +9,7 @@ import android.provider.AlarmClock
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -24,28 +27,31 @@ import java.lang.Float.parseFloat
 import java.util.*
 
 class TransferenciaDeArmazem : AppCompatActivity() {
+
+    private lateinit var prefs: PreferencesHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transferencia_de_armazem)
+        //enableEdgeToEdge()
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        prefs = PreferencesHelper(applicationContext)
+
 
         var bottomAppBar = findViewById<BottomAppBar>(R.id.bottomAppBar)
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView.rootView) { _, insets ->
-
-            //This lambda block will be called, every time keyboard is opened or closed
-
-            getWindow().setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimary));
-            val view = window.decorView
-            view.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            //view.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-
-
             val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
             if(imeVisible){
                 bottomAppBar.isVisible = false
             } else {
                 bottomAppBar.isVisible = true
             }
-
             insets
         }
 
@@ -60,7 +66,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         }
         var db = SQLiteHelper(this)
 
-        val username = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE)
+        val username = prefs.getData("username", "Guest")
 
         var idArmzOrig: String
         var idPrd: String
@@ -68,12 +74,8 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         var idMovimento: String
         var idArmzDest: String
 
-
-
         val dateFormatter = SimpleDateFormat("yyyyMMddkk:mm")
         val dty = dateFormatter.format(Date())
-
-
 
         var spinnerCodArmzOrig = findViewById<TextView>(R.id.spinnerCodArmzOrig)
         var spnArmzOrig = findViewById<AutoCompleteTextView>(R.id.spinnerArmzOrigem)
@@ -95,7 +97,6 @@ class TransferenciaDeArmazem : AppCompatActivity() {
         var spnArmzDest = findViewById<AutoCompleteTextView>(R.id.spinnerArmzDest)
 
         var rastro: Boolean
-
 
         fun saldoProduto(){
             var codArmzOrig = spinnerCodArmzOrig.text.toString()
@@ -120,10 +121,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
 
             if (codArmzOrig.length > 0 && codPrd.length > 0) {
                 var cursorLote = db.getLote("$codArmzOrig", "$codPrd")
-
-
                 if (cursorLote != null) {
-                    cursorLote.moveToFirst()
                     cursorArray.add(cursorLote.getString(1) + " - Saldo: " + "${cursorLote.getFloat(2)}")
                     while (cursorLote.moveToNext()) {
                         cursorArray.add(cursorLote.getString(1) + " - Saldo: " + "${cursorLote.getFloat(2)}")
@@ -212,10 +210,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             }
         }
 
-
         fun setOrRefreshSpnPrd() {
-
-
             var cursorPrd = db.getPrd()
             var cursorArray = ArrayList<Any>()
             if (cursorPrd != null) {
@@ -235,10 +230,8 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             spnPrd.onItemClickListener =
                 AdapterView.OnItemClickListener { p0, view, position, _id ->
                     if (view?.context != null) {
-
                         spinnerCodPrd.text = spnPrd.text.substring(0,15)
                         saldoProduto()
-
                         //if (spinnerCodArmzOrig.length() > 0 && spinnerCodPrd.length() > 0) {
                             setOrRefreshSpnLote()
                             Log.d("setOrRefreshSpnLote", "run? 1")
@@ -307,13 +300,11 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             var message = ""
             var rastro = db.getRastro(spinnerCodPrd?.text.toString())
 
-
             var armzOrig = spinnerCodArmzOrig.text
             var prod = spinnerCodPrd.text
             var lote = spinnerCodLote.text
             var qtdMovimento = if(!movimento.text.isNullOrEmpty()){parseFloat(movimento.text.toString())} else {0}
             var armzDest = spinnerCodArmzDest.text
-
 
             if (spinnerCodArmzOrig.text.isEmpty()){
                 message += "- Armazem origem; "
@@ -358,7 +349,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
             if (message.length >0) {
                 return showMessage.show()
             }
-            else if(rastro != null || !armzOrig.isNullOrEmpty() || !prod.isNullOrEmpty() || !lote.isNullOrEmpty() || qtdMovimento != 0 || !armzDest.isNullOrEmpty() || !username.isNullOrEmpty()){
+            else if(rastro != null || !armzOrig.isNullOrEmpty() || !prod.isNullOrEmpty() || !lote.isNullOrEmpty() || qtdMovimento != 0 || !armzDest.isNullOrEmpty() || username != "Guest"){
                 query =
                     "INSERT INTO Movimento (armazemOrigem, codProduto, lote, qtdMovimento, armazemDestino, dataHora, username, statusSync) " +
                             "VALUES ('$armzOrig', '$prod', '$lote', ${qtdMovimento}, '$armzDest', '$dty', '$username', 0)"
@@ -380,7 +371,7 @@ class TransferenciaDeArmazem : AppCompatActivity() {
                 cancel()
             }
             if (cod == 1){
-                startActivity(getIntent())
+                startActivity(Intent(ctxt, TransferenciaDeArmazem::class.java))
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
                 finish()
             } else if (cod == 0){

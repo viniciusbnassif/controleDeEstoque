@@ -1,11 +1,16 @@
 package com.kingdom.controledeestoque
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import android.util.Log
+import com.kingdom.controledeestoque.database.scope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 //import com.liderMinas.PCP.database.connectMSSQL
 
@@ -78,6 +83,7 @@ class SQLiteHelper(context: Context?):
         private const val MENSG = "mensagem"
         private const val DADOS_LCM = "dadosLancamento"
         private const val LIDO = "lido"
+        ///        private const val STATUS_SYNC = "statusSync"
 
         /*========================================================================*/
 
@@ -169,8 +175,9 @@ class SQLiteHelper(context: Context?):
                         MENSG +" VARCHAR(255) NOT NULL, " +
                         DATAHORA +" VARCHAR(13) NOT NULL, " +
                         DADOS_LCM + " VARCHAR(255) NOT NULL, " +
-                        USERNAME + " VARCHAR(64)," +
-                        LIDO + " VARCHAR(64)" +
+                        USERNAME + " VARCHAR(64), " +
+                        LIDO + " VARCHAR(64), " +
+                        STATUS_SYNC + " INT" +
                         ");")
 
 
@@ -202,8 +209,8 @@ class SQLiteHelper(context: Context?):
         db?.execSQL(createTBLSL)
         db?.execSQL(createTBLMOVIM)
         db?.execSQL(createTBLNOTIF)
+        //db?.execSQL(createDBREQS)
         //db?.execSQL(createDBPE)
-        db?.execSQL(createDBREQS)
         //db?.execSQL("INSERT INTO $TBL_NOTIF ($MENSG, $DADOS_LCM, $USERNAME) VALUES ('kane','123'), ('gilberto','12345', 'Gilberto Gonçalves'), ('zack', 'zsjl', 'Zachary Snyder');")
         //db?.execSQL("INSERT INTO Usuario (username, password) VALUES ('kane','123'), ('gilberto','12345', 'Gilberto Gonçalves'), ('zack', 'zsjl', 'Zachary Snyder');")
         //db?.execSQL("INSERT INTO produto (descProduto, qeProduto, validProduto, tipoVProduto) VALUES ('Selecione o item','', '', '');")
@@ -252,6 +259,135 @@ class SQLiteHelper(context: Context?):
         db.execSQL(dropDBPCP)
         onCreate(db)
     }
+
+    fun insertNotificacao(idNotificacao: Int, mensagem: String, dataHora: String,
+                          dadosLancamento: String, username: String, lido: String) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("idNotificacao", idNotificacao)
+                put("mensagem", mensagem)
+                put("dataHora", dataHora)
+                put("dadosLancamento", dadosLancamento)
+                put("username", username)
+                put("lido", lido)
+            }
+            db.insert("Notificacao", null, values)
+            Log.d("SQLiteNotf", "Query executada com sucesso: $idNotificacao")
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteErrorCGP", "Erro ao inserir Notificacao: $idNotificacao", e)
+        } finally {
+            db.close()
+        }
+    }
+
+    fun updateNotificacaoFinal(idNotificacao: Int, statusSync: Int?) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("statusSync", statusSync)
+            }
+
+            // Executa o update com cláusula WHERE
+            val rowsUpdated = db.update(
+                "Notificacao",                    // Nome da tabela
+                values,                     // Valores a serem atualizados
+                "idNotificacao = ?",              // Cláusula WHERE
+                arrayOf(idNotificacao.toString()) // Argumentos da cláusula WHERE
+            )
+
+            if (rowsUpdated > 0) {
+                Log.d("SQLiteNotificacao", "Registro atualizado com sucesso: idNotificacao = $idNotificacao")
+            } else {
+                Log.d("SQLiteNotificacao", "Nenhum registro encontrado para atualizar: idNotificacao = $idNotificacao")
+            }
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteError", "Erro ao atualizar carga: idNotificacao = $idNotificacao", e)
+        } finally {
+            db.close()
+        }
+    }
+
+    fun insertProduto(idProduto: Int, codProduto: String, descProduto: String,
+                      tipoProduto: String, unidMedida: String, rastro: String) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("idProduto", idProduto)
+                put("codProduto", codProduto)
+                put("descProduto", descProduto)
+                put("tipoProduto", tipoProduto)
+                put("unidMedida", unidMedida)
+                put("rastro", rastro)
+            }
+            db.insert("Produto", null, values)
+            Log.d("SQLiteProduto", "Query executada com sucesso: $idProduto")
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteErrorCGP", "Erro ao inserir Notificacao: $idProduto", e)
+        } finally {
+            db.close()
+        }
+    }
+    fun insertArmz(idArmazem: Int, codArmazem: String, descArmazem: String) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("idArmazem", idArmazem)
+                put("codArmazem", codArmazem)
+                put("descArmazem", descArmazem)
+
+            }
+            db.insert("Armazem", null, values)
+            Log.d("SQLiteArmazem", "Query executada com sucesso: $idArmazem")
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteErrorCGP", "Erro ao inserir Notificacao: $idArmazem", e)
+        } finally {
+            db.close()
+        }
+    }
+    fun insertSaldo(idSaldo: Int, codProduto: String, codArmazem: String, saldo: Float) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("idSaldo", idSaldo)
+                put("codProduto", codProduto)
+                put("codArmazem", codArmazem)
+                put("saldo", saldo)
+
+            }
+            var table = "Saldo"
+            db.insert("$table", null, values)
+            Log.d("SQLite$table", "Query executada com sucesso: $idSaldo")
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteErrorCGP", "Erro ao inserir Notificacao: $idSaldo", e)
+        } finally {
+            db.close()
+        }
+    }
+    fun insertSaldoLote(idSaldoLote: Int, codProduto: String, codArmazem: String, lote: String,
+                        validLote: String, saldoLote: Float) {
+        val db = this.writableDatabase
+        try {
+            val values = ContentValues().apply {
+                put("idSaldoLote", idSaldoLote)
+                put("codProduto", codProduto)
+                put("codArmazem", codArmazem)
+                put("lote", lote)
+                put("validLote", validLote)
+                put("saldoLote", saldoLote)
+
+            }
+            var table = "SaldoLote"
+            db.insert("$table", null, values)
+            Log.d("SQLite$table", "Query executada com sucesso: $idSaldoLote")
+        } catch (e: SQLiteException) {
+            Log.e("SQLiteErrorCGP", "Erro ao inserir Notificacao: $idSaldoLote", e)
+        } finally {
+            db.close()
+        }
+    }
+ 
+
     fun countNotf(username: String): Int {
         var result = db.query(
             TBL_NOTIF,
@@ -463,23 +599,25 @@ class SQLiteHelper(context: Context?):
     }
 
     fun getLote(armzOrig: String, codProd: String): Cursor? {
-        var cursor = db.query(
-            TBL_SALDOLOTE,
-            arrayOf(
-                "$ID_SL AS ${BaseColumns._ID}",
-                LOTE,
-                SALDO_LOTE
-            ),
-            "$COD_ARMZ = '$armzOrig' AND $COD_PROD = '$codProd'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
-            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
-            null /* GROUP BY clause, null if no GROUP BY clause */,
-            null /* HAVING CLAUSE, null if no HAVING clause */,
-            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
-        )
-        if (cursor == null || !cursor.moveToFirst()) {
+        var query = """
+            SELECT $ID_SL, $LOTE, $SALDO_LOTE
+            FROM $TBL_SALDOLOTE
+            WHERE $COD_ARMZ = '$armzOrig' AND $COD_PROD = '$codProd'
+            ORDER BY 
+                CASE 
+                    WHEN $SALDO_LOTE > 0 THEN 1  -- Prioriza registros com saldo > 0
+                    ELSE 2                       -- Depois registros com saldo <= 0
+                END;
+
+        """.trimIndent() //+
+        //"UNION SELECT * FROM Carga WHERE codinomeCarga = '';"
+        var cursor = db.rawQuery(query, null)
+
+        if (!cursor.moveToFirst()) {
             return null
         }
         return cursor
+
     }
 
     fun getSaldo(armzOrig: String, codProd: String): Cursor? {
@@ -564,34 +702,55 @@ class SQLiteHelper(context: Context?):
             null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
         )
     }
-    fun getInternalNotificacao(username: String): Cursor? {
-        var cursor = db.query(
-            TBL_NOTIF,
-            arrayOf(
-                "$ID_NOTIF AS ${BaseColumns._ID}",
-                MENSG,
-                DATAHORA,
-                DADOS_LCM,
-                USERNAME,
-                LIDO
-            ),
-            "$USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
-            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
-            null /* GROUP BY clause, null if no GROUP BY clause */,
-            null /* HAVING CLAUSE, null if no HAVING clause */,
-            ID_NOTIF + " DESC" //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
-        )
-        if (cursor == null || !cursor.moveToFirst()) {
-            return null
+        fun getInternalNotificacao(username: String): Cursor? {
+            var cursor = db.query(
+                TBL_NOTIF,
+                arrayOf(
+                    "$ID_NOTIF AS ${BaseColumns._ID}",
+                    MENSG,
+                    DATAHORA,
+                    DADOS_LCM,
+                    USERNAME,
+                    LIDO
+                ),
+                "$USERNAME = '$username'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+                null /* arguments to replace ? place holder in the WHERE clause, null if none */,
+                null /* GROUP BY clause, null if no GROUP BY clause */,
+                null /* HAVING CLAUSE, null if no HAVING clause */,
+                ID_NOTIF + " DESC" //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
+            )
+            if (cursor == null || !cursor.moveToFirst()) {
+                return null
+            }
+            return cursor
         }
-        return cursor
+
+    fun getLastNotificationId(): Int? {
+        val cursor = db.query(
+            TBL_NOTIF,
+            arrayOf(ID_NOTIF),
+            null, // Sem WHERE
+            null,
+            null,
+            null,
+            "$ID_NOTIF DESC", // Ordena pelo maior ID
+            "1" // Limita a 1 resultado
+        )
+
+        return if (cursor != null && cursor.moveToFirst()) {
+            cursor.getInt(0) // Retorna o ID do último registro
+        } else {
+            null
+        }.also {
+            cursor?.close() // Fecha o cursor para evitar leaks
+        }
     }
 
     fun setNotificationRead(id: Int?) {
         var query: String
         if (id != null){
             query = "UPDATE $TBL_NOTIF " +
-                    "SET $LIDO = 'S' " +
+                    "SET $LIDO = 'S' AND $STATUS_SYNC = 0 " +
                     "WHERE $ID_NOTIF = $id"
             db.execSQL(query)
         }
@@ -602,7 +761,7 @@ class SQLiteHelper(context: Context?):
             arrayOf(
                 "$ID_NOTIF AS ${BaseColumns._ID}",
             ),
-            "$LIDO = 'S'" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
+            "$LIDO = 'S' AND $STATUS_SYNC = 0" /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
             null /* arguments to replace ? place holder in the WHERE clause, null if none */,
             null /* GROUP BY clause, null if no GROUP BY clause */,
             null /* HAVING CLAUSE, null if no HAVING clause */,
@@ -702,20 +861,38 @@ class SQLiteHelper(context: Context?):
         }
     }
 
+    fun updateMovimento(idMovimento: Int, statusSync: Int?) {
+        val db = this.writableDatabase
+        scope.launch(Dispatchers.IO) {
+            try {
+                val values = ContentValues().apply {
+                    put("statusSync", statusSync)
+                }
 
-    /*fun getMotivo(): Cursor {
-        return db.query(
-            TBL_MOTIVO,
-            arrayOf("$ID_MOTIVO AS ${BaseColumns._ID}",
-                DESC_MOTIVO
-            ),
-            null /* WHERE clause less the WHERE keyword, null = no WHERE clause */,
-            null /* arguments to replace ? place holder in the WHERE clause, null if none */,
-            null /* GROUP BY clause, null if no GROUP BY clause */,
-            null /* HAVING CLAUSE, null if no HAVING clause */,
-            null //DESC_PROD + " ASC" /* ORDER BY clause products will be shown alphabetically a->z*/
-        )
-    }*/
+                // Executa o update com cláusula WHERE
+                val rowsUpdated = db.update(
+                    TBL_MOVIM,                    // Nome da tabela
+                    values,                     // Valores a serem atualizados
+                    "idMovimento = ?",              // Cláusula WHERE
+                    arrayOf(idMovimento.toString()) // Argumentos da cláusula WHERE
+                )
+
+                if (rowsUpdated > 0) {
+                    Log.d("SQLiteCarga", "Registro atualizado com sucesso: idCarga = $idMovimento")
+                } else {
+                    Log.d(
+                        "SQLiteCarga",
+                        "Nenhum registro encontrado para atualizar: idCarga = $idMovimento"
+                    )
+                }
+            } catch (e: SQLiteException) {
+                Log.e("SQLiteError", "Erro ao atualizar carga: idCarga = $idMovimento", e)
+            } finally {
+                db.close()
+            }
+        }
+    }
+
 }
 
 

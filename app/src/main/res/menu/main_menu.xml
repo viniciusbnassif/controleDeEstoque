@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/accountView"
-        android:icon="@drawable/person_24"
+        android:icon="@drawable/rounded_person_24"
         android:title="Conta"
         app:showAsAction="always" />
 

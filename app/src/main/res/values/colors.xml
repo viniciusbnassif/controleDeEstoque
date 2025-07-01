@@ -2,24 +2,31 @@
 <resources>
     <color name="color_0">#FFE1F3FF</color>
     <color name="color_100">#FFB2DFF0</color>
-    <color name="colorPrimary">#0080F8</color>
-    <color name="colorPrimaryVariant">#405F90</color>
-    <color name="colorPrimaryContainer">#D6E3FF</color>
-    <color name="colorOnPrimaryContainer">#09305F</color>
-    <color name="colorSecondary">#8291AF</color>
+    <color name="colorPrimary">#475D92</color>
+    <color name="colorPrimaryVariant">#70b46a</color>
+    <color name="colorPrimaryContainer">#D9E2FF</color>
+    <color name="colorOnPrimaryContainer">#2F4578</color>
+    <color name="alternativeColorPrimaryContainer">#EEF0FF</color>
+    <color name="alternativeColorOnPrimaryContainer">#152E60</color>
+    <color name="colorSecondaryContainer">#DCE2F9</color>
+    <color name="colorOnSecondaryContainer">#404659</color>
+    <color name="colorSecondary">#575E71</color>
     <color name="colorSecondaryVariant">#555F71</color>
-    <color name="colorSecondaryContainer">#DAE2F9</color>
+    <color name="colorBackground">#FEFBFF</color>
+    <color name="colorBackgroundUltraNothing">#1A8E8E8E</color>
+
+
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="spacegray">#44444444</color>
     <color name="suErrorRed">#741919</color>
-    <color name="lightErrorRed">#FDDADA</color>
     <color name="suSuccessGreen">#197419</color>
     <color name="lightSuccessGreen">#DAFDDA</color>
-    <color name="appBarColor">#004C69</color>
     <color name="textColorPrimary">#000000</color>
     <color name="textColorSecondary">#232323</color>
     <color name="textColorTertiary">#545454</color>
     <color name="containerBackground">#E0F3FF</color>
+    <color name="chip_default">#F7FCFF</color> <!-- Cor padrão do chip -->
     <color name="unreadBackgroundColor">#E1F3FF</color>
 </resources>

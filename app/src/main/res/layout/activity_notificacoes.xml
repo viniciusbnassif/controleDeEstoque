@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context=".Notificacoes">
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -18,6 +20,7 @@
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -26,11 +29,11 @@
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/appBarColor"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:navigationIconTint="@color/white"
+                app:navigationIcon="@drawable/rounded_arrow_back_24"
+                app:navigationIconTint="@color/textColorTertiary"
                 app:title="Notificações"
-                app:titleTextColor="@color/white" />
+                app:titleTextColor="@color/textColorTertiary" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progressToolbar"
@@ -41,35 +44,45 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollIndicators="right"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewNotificacao"
+            <ScrollView
+                android:id="@+id/swipe"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scrollIndicators="right"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/item_notificacao"/>
+                app:layout_constraintStart_toStartOf="parent">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    >
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewNotificacao"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:listitem="@layout/item_notificacao" />
 
+                </com.google.android.material.card.MaterialCardView>
+            </ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/aviso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Não há dados a serem exibidos no momento."
+                android:textAlignment="center"
+                android:visibility="gone" />
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <TextView
-            android:id="@+id/aviso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Não há dados a serem exibidos no momento."
-            android:textAlignment="center"
-            android:visibility="gone" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

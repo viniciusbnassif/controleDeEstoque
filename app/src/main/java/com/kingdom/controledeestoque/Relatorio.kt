@@ -1,28 +1,62 @@
 package com.kingdom.controledeestoque
 
-import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Looper
-import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.*
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
-class Relatorio : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View?
-            = inflater.inflate(R.layout.activity_relatorio, container, false).apply {
+class Relatorio : AppCompatActivity() {
 
+    @SuppressLint("SetJavaScriptEnabled")
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_relatorio)
+        enableEdgeToEdge()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        fun isLightTheme(): Boolean {
+            return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO
+        }
+        // Verifique se está no modo claro ou escuro
+        if (isLightTheme()) {
+            // Ícones escuros (modo claro)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        } else {
+            // Ícones claros (modo escuro)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
+
+
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar) // Configura a Toolbar como barra de ação
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed() // Fecha a Activity ou volta na pilha de navegação
+        }
 
         val myWebView: WebView = findViewById(R.id.webView)
         myWebView.webViewClient = WebViewClient()
@@ -33,27 +67,24 @@ class Relatorio : Fragment() {
         myWebView.settings.loadWithOverviewMode = true
         myWebView.loadUrl("http://192.168.1.10/report_server/Pages/ReportViewer.aspx?%2fLiderMinas%2fRLM0078&rs:Command=Render")
 
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Infla o menu
+                menuInflater.inflate(R.menu.relatorio, menu)
+            }
 
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Lidar com cliques no menu
+                return when (menuItem.itemId) {
+                    R.id.refresh -> {
+                        myWebView.reload()
 
-        var refresh = findViewById<ImageView>(R.id.refresh)
-
-        refresh.setOnClickListener{
-            myWebView.reload()
-        }
-
-
-        /*var contentContainer = findViewById<TableView>(R.id.content_container)
-
-        var ch = "test"
-        var rh = "test"
-        var c = "test"
-
-        var list =
-
-
-        var adapter = contentContainer.setAdapter()
-
-        contentContainer.setAdapter(adapter)*/
+                        false
+                    }
+                    else -> false
+                }
+            }
+        }, this) // Menu ativo enquanto o lifecycle estiver em RESUMED
 
     }
 }

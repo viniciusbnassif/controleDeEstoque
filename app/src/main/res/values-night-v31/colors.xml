@@ -2,11 +2,19 @@
 <resources>
     <color name="color_0">#FFE1F3FF</color>
     <color name="color_100">#FFB2DFF0</color>
-    <color name="colorSecondary">@color/material_dynamic_secondary40</color>
     <color name="colorPrimaryVariant">@color/material_dynamic_primary60</color>
     <color name="colorPrimary">@color/material_dynamic_primary40</color>
     <color name="colorPrimaryContainer">@color/material_dynamic_primary10</color>
-    <color name="colorOnPrimaryContainer">@color/material_dynamic_primary50</color>
+    <color name="colorOnPrimaryContainer">@color/material_dynamic_primary60</color>
+    <color name="alternativeColorPrimaryContainer">@color/material_dynamic_primary10</color>
+    <color name="alternativeColorOnPrimaryContainer">@color/material_dynamic_primary80</color>
+    <color name="colorSecondaryContainer">@color/material_dynamic_secondary20</color>
+    <color name="colorOnSecondaryContainer">@color/material_dynamic_secondary80</color>
+    <color name="colorSecondary">@color/material_dynamic_secondary40</color>
+    <color name="colorBackground">@color/material_dynamic_secondary0</color>
+    <color name="colorBackgroundUltraNothing">#1A8E8E8E</color>
+
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="spacegray">#44444444</color>
@@ -14,10 +22,12 @@
     <color name="lightErrorRed">#FDDADA</color>
     <color name="suSuccessGreen">#197419</color>
     <color name="lightSuccessGreen">#DAFDDA</color>
-    <color name="appBarColor">@color/material_dynamic_primary30</color>
+    <color name="appBarColor">@color/material_dynamic_primary10</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="textColorSecondary">#DCDCDC</color>
     <color name="textColorTertiary">#898989</color>
     <color name="containerBackground">@color/material_dynamic_primary10</color>
+    <color name="chip_default">@color/material_dynamic_primary0</color> <!-- Cor padrão do chip -->
     <color name="unreadBackgroundColor">@color/material_dynamic_tertiary20</color>
 </resources>
+

@@ -1,36 +1,30 @@
 package com.kingdom.controledeestoque
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Looper
-import android.provider.AlarmClock
+import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.kingdom.controledeestoque.database.Sync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,46 +34,82 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Boolean.TRUE
 
+class MainMenu : AppCompatActivity() {
+    //lateinit var username : String
+    private lateinit var prefs: PreferencesHelper
 
-class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
-    var username = username
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View?
-    = inflater.inflate(R.layout.activity_main_menu, container, false).apply {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main_menu)
 
-        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.appBar)
-        (activity as AppCompatActivity).setSupportActionBar(toolbar)
-        setHasOptionsMenu(true)
 
-        var ctxt = getActivity()?.getApplicationContext()
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
-        var cl = findViewById<ConstraintLayout>(R.id.CL)
+        fun isLightTheme(): Boolean {
+            return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO
+        }
+        // Verifique se está no modo claro ou escuro
+        if (isLightTheme()) {
+            // Ícones escuros (modo claro)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or
+                    View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        } else {
+            // Ícones claros (modo escuro)
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
 
-        var progressTB =
-            findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.progressToolbar)
-        val buttonTrArmz: Button = findViewById(R.id.trArmz)
-        var syncBtn = findViewById<ExtendedFloatingActionButton>(R.id.syncBtn)
+
+        prefs = PreferencesHelper(applicationContext)
+        val username = prefs.getData("username", "Guest")
+
+        //val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.appBar)
+        //setSupportActionBar(toolbar)
+
+        var ctxt = applicationContext
+
+        var cl = findViewById<ConstraintLayout>(R.id.main)
+
+        //var progressTB = findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.progressToolbar)
+        val buttonTrArmz= findViewById<Button>(R.id.trArmz)
+        val buttonRelat= findViewById<MaterialButton>(R.id.relatorio)
+        val buttonNotif = findViewById<MaterialButton>(R.id.notificacoes)
+        var syncBtn = findViewById<MaterialButton>(R.id.syncBtn)
+
 
         fun showProgress(result: String) {
             if (result == "true") {
-                progressTB.setVisibility(View.VISIBLE)
+                //progressTB.setVisibility(View.VISIBLE)
                 syncBtn.setEnabled(false)
                 syncBtn.setText("Sincronizando")
                 buttonTrArmz.setEnabled(false)
                 buttonTrArmz.text = "Aguarde a sincronização ser concluída"
+                buttonRelat.setEnabled(false)
+                buttonNotif.setEnabled(false)
             } else if (result == "false") {
-                progressTB.setVisibility(View.INVISIBLE)
+                //progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
                 syncBtn.setText("Sincronizar")
                 buttonTrArmz.setEnabled(true)
                 buttonTrArmz.setText("Transferência de armazem")
+                buttonRelat.setEnabled(true)
+                buttonNotif.setEnabled(true)
             } else if (result == "syncFail") {
-                progressTB.setVisibility(View.INVISIBLE)
+                //progressTB.setVisibility(View.INVISIBLE)
                 syncBtn.setEnabled(true)
                 syncBtn.setText("Falha ao sincronizar")
                 buttonTrArmz.setEnabled(true)
                 buttonTrArmz.setText("Falha ao sincronizar\nTransferência de armazem")
+                buttonRelat.setEnabled(true)
+                buttonNotif.setEnabled(true)
 
                 // IMPLEMENTAR MUDANÇA: TELA DE NOTIFICAÇÕES DEVE FICAR BLOQUEADA ATÉ FINAL DA SINCRONIZAÇÃO
 
@@ -106,12 +136,16 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                         .setCancelable(false)
                         .show()
                 }
-
             }
         }
 
-        suspend fun postConnectionView(result: String) {
+        val mainLayout = findViewById<View>(R.id.main_layout)
+        val retryBTN = findViewById<MaterialButton>(R.id.refreshConnection)
 
+
+
+
+        suspend fun postConnectionView(result: String) {
             return withContext(Dispatchers.Main) {
                 try {
                     if (result == "Falha") {
@@ -131,6 +165,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                                     dialog.dismiss()
                                 }
                         }
+                        mainLayout.visibility = View.VISIBLE
                     } else if (result == "Sem Conexão" || result == "") {
                         if (ctxt != null) {
                             MaterialAlertDialogBuilder(ctxt)
@@ -155,9 +190,10 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                         .setActionTextColor(
                             Color.WHITE
                         ).setAction("OK") {}.show()*/
+                        mainLayout.visibility = View.VISIBLE
                     } else if (result == "Sucesso") {
                         Snackbar.make(
-                            findViewById(R.id.CL),
+                            findViewById(R.id.main),
                             "Sincronizado com sucesso!",
                             Snackbar.LENGTH_SHORT
                         ).setBackgroundTint(Color.parseColor("#197419"))
@@ -166,6 +202,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                                 Color.WHITE
                             ).setAction("OK") {}.show()
                     }
+                    mainLayout.visibility = View.GONE
                 } catch (e: Exception) {
                     Log.d("postConnectionView", e.toString())
                 }
@@ -181,23 +218,26 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                 var rs = ""
                     rs = Sync().testConnection().toString()
 
-
             postConnectionView(rs)
             Log.d("ConnectionView result2", rs)
             //return result
-            postConnectionView(rs)
-
-
-            //Log.d("ConnectionView rtn", rtn)
-
-
-            //postConnectionView(rtn)
-
-
         }
 
         CoroutineScope(Dispatchers.IO).async {
             connectionView()
+        }
+
+        retryBTN.setOnClickListener {
+            mainLayout.visibility = View.GONE
+            CoroutineScope(Dispatchers.IO).launch {
+                connectionView()
+            }
+        }
+
+        var accountBtn = findViewById<MaterialButton>(R.id.accountBtn)
+        accountBtn.setOnClickListener {
+            val modalBottomSheet = ModalBottomSheet(username)
+            modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
         }
 
         fun postSyncSuccess() {
@@ -219,7 +259,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
             }
         }
 
-        fun updateBadge(){ //Esse metodo atualiza o contador na barra de navegação
+        /*fun updateBadge(){ //Esse metodo atualiza o contador na barra de navegação
             var cursor = username?.let { SQLiteHelper(ctxt).countNotf(it) } //Conta quantas notificações não lidas existem para o usuario atual
             if (cursor != null) { //Por segurança, se o resultado for nulo (muito dificil) ele não fará nada.
 
@@ -229,7 +269,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
                     myactivity?.getCount(cursor) //executa o metodo que atualiza o contador, passando o numero obtido pelo cursor na primeira linha da função.
                 }
             }
-        }
+        }*/
 
         suspend fun synchronization() {
             var msg = ""
@@ -252,7 +292,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
 
                     if (r == "Sucesso"){
                         MainScope().launch {
-                            updateBadge()
+                            //updateBadge()
                             try {
                                 showProgress("false")
                                 Log.d("run?", "run?")
@@ -286,7 +326,7 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
 
         var customAlertDialogView : View = layoutInflater.inflate(R.layout.alertdialog_sync_running, null)
         var materialAlertSync =
-            MaterialAlertDialogBuilder(context)
+            MaterialAlertDialogBuilder(this)
                 .setView(customAlertDialogView)
                 .setTitle("Sincronizando")
                 .setCancelable(false)
@@ -296,65 +336,83 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
         suspend fun doSync() {
             syncBtn.isEnabled = false
             var show = materialAlertSync.show()
+            var thisctxt = this
             //var data = String
             // <- extension on current scope
             Log.d("context inside method from button sync", "${ctxt.toString()}")
             CoroutineScope(Dispatchers.IO).run {
-                var data = Sync().sync(0, activity?.applicationContext!!)
-
-
-                //val result = data.await()
-                if (data == "Sucesso") {
-                    MainScope().launch {
-                        show.cancel()
-                        //whileSync(false)
-                        /*Snackbar.make(
+                if (username != "Guest") {
+                    var data = Sync().sync(0, applicationContext!!)
+                    //val result = data.await()
+                    if (data == "Sucesso") {
+                        MainScope().launch {
+                            show.cancel()
+                            //whileSync(false)
+                            /*Snackbar.make(
                     cl,
                     "Sincronizado com sucesso!",
                     Snackbar.LENGTH_SHORT
                 ).setBackgroundTint(Color.parseColor("#197419")).setTextColor(Color.WHITE)
                     .setActionTextColor(Color.WHITE).setAction("OK") {}.show()*/
-                        MaterialAlertDialogBuilder(context)
-                            .setTitle("Sincronizando")
-                            .setMessage("Sincronizado com sucesso")
-                            .setCancelable(false)
-                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
-                            .show()
+                            MaterialAlertDialogBuilder(thisctxt)
+                                .setTitle("Sincronizando")
+                                .setMessage("Sincronizado com sucesso")
+                                .setCancelable(false)
+                                //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                                .setNeutralButton("Fechar") { dialog, _ ->
+                                    var mainMenu = Intent(ctxt, MainMenu::class.java)
+                                    startActivity(mainMenu)
+                                    finish()
+                                }
+                                .show()
+                        }
+                    } else if (data == "Falha") {
+                        MainScope().launch {
+                            show.cancel()
+                            MaterialAlertDialogBuilder(thisctxt)
+                                .setTitle("Falha")
+                                .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                                .setCancelable(false)
+                                //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                                .setNeutralButton("Fechar") { dialog, _ ->
+                                    var mainMenu = Intent(ctxt, MainMenu::class.java).apply {
+                                        putExtra(EXTRA_MESSAGE, username)
+                                    }
+                                    startActivity(mainMenu)
+                                    finish()
+                                }
+                                .show()
+                        }
+                    } else {
+                        MainScope().launch {
+                            MaterialAlertDialogBuilder(thisctxt)
+                                .setTitle("Falha")
+                                .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
+                                .setCancelable(false)
+                                //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
+                                .setNeutralButton("Fechar") { dialog, _ ->
+                                    var mainMenu = Intent(ctxt, MainMenu::class.java).apply {
+                                        putExtra(EXTRA_MESSAGE, username)
+                                    }
+                                    startActivity(mainMenu)
+                                    finish()
+                                }
+                                .show()
+
+                            show.cancel()
+                        }
                     }
-
-
-                } else if (data == "Falha") {
-
-                    MainScope().launch {
-                        show.cancel()
-                        MaterialAlertDialogBuilder(context)
-                            .setTitle("Falha")
-                            .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
-                            .setCancelable(false)
-                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
-                            .show()
-                    }
-
-                    //withContext(Dispatchers.Main) { connectionView() }
                 } else {
-                    MainScope().launch {
-                        MaterialAlertDialogBuilder(context)
-                            .setTitle("Falha")
-                            .setMessage("Ocorreu um erro ao sincronizar. Verifique o estado da conexão e tente novamente.")
-                            .setCancelable(false)
-                            //.setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as MainNav).restartFragment(R.id.menu) }.show()
-                            .setNeutralButton("Fechar") { dialog, _ -> (requireActivity() as Main_nav).restartFragment() }
-                            .show()
-
-                        show.cancel()
-                    }
-                    /* TO DO */
+                    Snackbar.make(
+                        cl,
+                        "Error: Username = 'Guest'",
+                        Snackbar.LENGTH_SHORT
+                    ).setBackgroundTint(Color.parseColor("#000000")).setTextColor(Color.WHITE)
+                        .setActionTextColor(Color.WHITE).setAction("OK") {}.show()
                 }
-
             }
         }
+
 
         syncBtn.setOnClickListener {
             CoroutineScope(Dispatchers.Main).launch {
@@ -364,56 +422,54 @@ class MainMenu(username: String) : Fragment()/*, LifecycleEventObserver*/ {
         }
         var intent: Intent
 
-        var sairBtn = findViewById<Button>(R.id.sair)
-        sairBtn.setOnClickListener {
-            MainScope().launch {
-                intent = Intent(ctxt, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-
-            }
-        }
-
-        val username = Intent().getStringExtra(AlarmClock.EXTRA_MESSAGE)
-        //val username = username
-        var saudacao = "Bem-vindo, ${username}" // 11
-        findViewById<TextView>(R.id.saudacao).apply { text = saudacao }
 
         buttonTrArmz.setOnClickListener {
             intent = Intent(ctxt, TransferenciaDeArmazem::class.java)
-                .apply {
-                    putExtra(AlarmClock.EXTRA_MESSAGE, username)
-                }
             startActivity(intent)
         }
-    }
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.main_menu, menu)
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.accountView -> {
-                val modalBottomSheet = ModalBottomSheet(username)
-                modalBottomSheet.show(childFragmentManager, ModalBottomSheet.TAG)
-
-                false
-
-
-            }
-            else -> super.onOptionsItemSelected(item)
+        buttonRelat.setOnClickListener {
+            intent = Intent(ctxt, Relatorio::class.java)
+            startActivity(intent)
         }
-    }
+        buttonNotif.setOnClickListener {
+            intent = Intent(ctxt, Notificacoes::class.java)
+            startActivity(intent)
+        }
 
+
+        // Adicionar MenuProvider
+        /*addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Infla o menu
+                menuInflater.inflate(R.menu.main_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Lidar com cliques no menu
+                return when (menuItem.itemId) {
+                    R.id.accountView -> {
+                        val modalBottomSheet = ModalBottomSheet(username)
+                        modalBottomSheet.show(supportFragmentManager, ModalBottomSheet.TAG)
+
+                        false
+                    }
+                    else -> false
+                }
+            }
+        }, this) // Menu ativo enquanto o lifecycle estiver em RESUMED*/
+
+    }
 }
 
-class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
-    var user = username
+class ModalBottomSheet(username: String?) : BottomSheetDialogFragment() {
+    //var user = username
+    private lateinit var prefs: PreferencesHelper
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View?
             = inflater.inflate(R.layout.bottom_sheet, container, false).apply {
-
+        prefs = activity?.let { PreferencesHelper(it.applicationContext) }!!
 
         var ctxt = activity?.applicationContext
 
@@ -421,12 +477,11 @@ class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
         var guia = findViewById<MaterialButton>(R.id.btnGuia)
         var sair = findViewById<MaterialButton>(R.id.btnSair)
         var versao = findViewById<MaterialButton>(R.id.versionView)
-        userview.text = user
+        userview.text = prefs.getData("username", "Guest")
         guia.setOnClickListener{
             //val contentUri = FileProvider.getUriForFile(context, "com.liderMinas.PCP", getResources().openRawResource(R.drawable.guia);)
             var intent = Intent(ctxt, PdfActivity::class.java)
             startActivity(intent)
-
         }
         sair.setOnClickListener {
             var intent = Intent(ctxt, MainActivity::class.java)
@@ -443,15 +498,10 @@ class ModalBottomSheet(username: String) : BottomSheetDialogFragment() {
         }
 
         val versionName = pInfo!!.versionName //Version Name
-
         val versionCode = pInfo!!.versionCode //
-
-
-
         val verCode = pInfo.versionCode //Version Code
 
-        versao.text = "Versão do CE: ${versionName}"
-
+        versao.text = "Versão do aplicativo: ${versionName}"
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return (super.onCreateDialog(savedInstanceState) as BottomSheetDialog).apply {

@@ -13,4 +13,5 @@
         <item name="iconTint">@drawable/ic_outline_library_add_24</item>
         <item name="strokeColor">#00FFFFFF</item>
     </style>
+
 </resources>

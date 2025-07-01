@@ -2,8 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context=".TransferenciaDeArmazem">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -156,7 +158,6 @@
                         android:inputType="none|text" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-
                 <Space
                     android:id="@+id/space"
                     android:layout_width="match_parent"
@@ -164,11 +165,9 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/viewSpinnerArmzDest"></Space>
-
+                    app:layout_constraintTop_toBottomOf="@+id/viewSpinnerArmzDest"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
         </androidx.core.widget.NestedScrollView>
 
         <com.google.android.material.bottomappbar.BottomAppBar
@@ -178,11 +177,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:keepScreenOn="true"
-            app:backgroundTint="@color/colorPrimary"
+            app:navigationIcon="@drawable/rounded_arrow_back_24"
+            app:backgroundTint="@color/colorBackground"
             app:hideOnScroll="true"
-            app:navigationIconTint="#FFFFFF"
             app:titleTextColor="@color/white">
-
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
